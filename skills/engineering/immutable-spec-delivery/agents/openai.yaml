@@ -1,0 +1,4 @@
+interface:
+  display_name: "Immutable Spec Delivery"
+  short_description: "Immutable spec-driven delivery and acceptance workflow"
+  default_prompt: "Use $immutable-spec-delivery to execute work from append-only specs with item-level commits and evidence-based acceptance."
