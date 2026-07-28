@@ -1,5 +1,5 @@
 ---
-name: multi-agent-review
+name: multi-review
 description: Run a multi-agent code review with Claude, Codex, and Cursor, then synthesize one human-controlled checklist summary.
 disable-model-invocation: true
 ---
@@ -11,7 +11,7 @@ their headless CLIs, plus Claude itself — collects one review file per agent u
 `code_review/<feature>/`, then synthesizes them into one human-controlled
 `summary.md` checklist. Review-only by default: **never modify product code**.
 
-This skill pairs with `immutable-spec-delivery`. When an active spec exists it is
+This skill pairs with `immutable-spec`. When an active spec exists it is
 used either as the review *target* or as the review *standard*, depending on the
 command (see Scope Resolution).
 
@@ -110,9 +110,9 @@ Recommend adding `code_review/` to `.gitignore` if absent. Do not edit
    background, then wait:
 
    ```bash
-   bash .claude/skills/multi-agent-review/scripts/run_review_agent.sh \
+   bash .claude/skills/multi-review/scripts/run_review_agent.sh \
      codex <feature> tmp/review/<feature>/review.prompt.txt &
-   bash .claude/skills/multi-agent-review/scripts/run_review_agent.sh \
+   bash .claude/skills/multi-review/scripts/run_review_agent.sh \
      cursor <feature> tmp/review/<feature>/review.prompt.txt &
    wait
    ```

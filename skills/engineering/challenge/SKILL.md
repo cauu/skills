@@ -1,5 +1,5 @@
 ---
-name: adversarial-solution-review
+name: challenge
 description: Review a proposed solution from an adversarial perspective before implementation. Use when the user presents a technical design, architecture, implementation plan, migration strategy, or product proposal and wants to determine whether it is worth executing, simplify it, or challenge its assumptions.
 ---
 

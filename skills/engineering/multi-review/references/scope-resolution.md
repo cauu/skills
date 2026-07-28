@@ -18,7 +18,7 @@ SPEC_ID="$(sed -nE 's/.*-(S[0-9.]+)-.*/\1/p' <<<"$SPEC_FILE")"   # e.g. S0044
 
 ## Case 1 — review the spec's changes (committed + uncommitted)
 
-The immutable-spec-delivery convention commits each item as
+The immutable-spec convention commits each item as
 `spec(<spec-filename>): <item-id> ...`, so every commit for the spec is grep-able.
 
 ```bash

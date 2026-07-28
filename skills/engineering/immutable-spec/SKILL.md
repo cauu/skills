@@ -1,5 +1,5 @@
 ---
-name: immutable-spec-delivery
+name: immutable-spec
 description: Execute software delivery with append-only specification documents as the single source of truth. Use when the user requires each request to be tracked in one spec containing requirement details, solution design, execution plan, and test acceptance criteria, and requires item-level commits (for example p3-1) that reference the spec filename.
 ---
 
@@ -101,7 +101,6 @@ Closure Reason:
 - Risk and rollback strategy
 
 ## References
-- docs/codebase-map.md
 - <other spec-local references as needed>
 
 ## 3. Execution Plan
@@ -136,8 +135,6 @@ Reference rules:
   indexes, design docs, API mappings, ADRs, or external requirement documents.
 - `References` support the spec; they do not replace the spec's own
   requirement, design, execution, or acceptance sections.
-- See [`references/codebase-map.md`](references/codebase-map.md) for the
-  repository-index reference rules.
 
 Do not allow more than one `active` spec at the same time.
 
@@ -312,17 +309,6 @@ Create a new spec only when the user changes scope, constraints, or requirements
    - promote the new draft to the only active spec
 5. Record the replaced spec's `Spec-ID` in the new active spec as `Previous Spec-ID`.
 6. Do not inherit unfinished plan items automatically into the new spec. Re-state the new scope and plan explicitly in the new spec.
-
-## Codebase Map and Repository Index
-
-Use the repository index rules in
-[`references/codebase-map.md`](references/codebase-map.md).
-
-That reference defines:
-- where `docs/codebase-map.md` lives
-- how specs should reference it
-- when to trust it versus rescan code
-- when to update it incrementally versus regenerate it fully
 
 ## Exceptions
 
