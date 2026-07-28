@@ -1,6 +1,0 @@
-interface:
-  display_name: "Multi-Agent Review"
-  short_description: "Review changes with multiple coding agents"
-  default_prompt: "Use $multi-review to review the current changes with multiple coding agents."
-policy:
-  allow_implicit_invocation: false

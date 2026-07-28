@@ -1,8 +1,11 @@
-# <MODEL> Review — <feature>
+# <REVIEWER_ID> Code Review — <feature>
 
-Scope reviewed: <case 1 spec-changes | case 2 uncommitted-code | case 3 no-spec>
+Reviewer ID: <review-01>
+Provider: <claude | codex | cursor | native>
+Execution: <external-cli | native-subagent>
+Scope reviewed: <explicit ref/range | working tree | branch fallback>
 Base/diff: <base ref or "working tree">  |  Files: <N>, Lines: <±M>
-Spec standard: <spec filename or "none">
+Review standard: <document path or "none">
 
 ## Assessment
 
@@ -26,11 +29,10 @@ One-line rationale.
 ### P3 — Low
 - ...
 
-## Spec Compliance
-<!-- omit this section if no spec standard was provided -->
-- p1-1 <deliverable>: met | partially-met | not-met — evidence
-- TC-1 <criterion>: met | partially-met | not-met — evidence
-- Scope drift: <code beyond spec, or spec items with no change>
+## Standard Compliance
+<!-- omit this section if no review standard was provided -->
+- <requirement or criterion>: met | partially-met | not-met — evidence
+- Scope drift: <code beyond the standard, or requirements with no change>
 
 ## Removal / Iteration candidates
 - <safe-delete-now | defer-with-plan>: ...

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Code Review"
+  short_description: "Review code and produce a human-controlled advisory report"
+  default_prompt: "Use $code-review to review the current changes."
+policy:
+  allow_implicit_invocation: false

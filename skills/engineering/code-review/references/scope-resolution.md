@@ -1,4 +1,4 @@
-# Scope Resolution
+# Code Review Scope Resolution
 
 Deterministic git commands for selecting review input. Run them from the
 repository root.
