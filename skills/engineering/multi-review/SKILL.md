@@ -11,10 +11,6 @@ their headless CLIs, plus Claude itself — collects one review file per agent u
 `code_review/<feature>/`, then synthesizes them into one human-controlled
 `summary.md` checklist. Review-only by default: **never modify product code**.
 
-This skill pairs with `immutable-spec`. When an active spec exists it is
-used either as the review *target* or as the review *standard*, depending on the
-command (see Scope Resolution).
-
 ## Commands
 
 - `review` (default): resolve scope, fan out to all available agents, write one
@@ -26,39 +22,37 @@ If the user does not name a command, infer `review`.
 
 ## Scope Resolution
 
-First detect the active spec: a single `*.md` file directly in `docs/specs/`
-(not in `draft/` or `completed/`) is the active spec. Exact git commands are in
-[`references/scope-resolution.md`](references/scope-resolution.md). Three cases:
+Resolve two independent inputs:
 
-1. **Review the spec's changes** — user asks to review "this spec" / "本次 spec
-   的变更". Requires an active spec. Review *all* changes attributable to the spec,
-   including already-committed ones. The base is the parent of the spec's first
-   commit (found via `git log --grep=<spec-filename>`); the scope is
-   `git diff <base>` (committed + uncommitted) plus any unstaged work. The spec
-   file is included both as a changed file and as the acceptance standard.
+1. **Review scope** — the code changes to inspect.
+2. **Review standard** — an optional requirement, design, acceptance, or policy
+   document supplied by the user.
 
-2. **Review the code changes** — user asks to review "the code" / "本次代码变更".
-   Scope is the uncommitted working-tree diff only (unstaged + staged). If an
-   active spec exists, pass its requirements as the **review standard** (does the
-   uncommitted code satisfy the spec?), but do not expand the diff to committed
-   work.
+Exact git commands are in
+[`references/scope-resolution.md`](references/scope-resolution.md).
 
-3. **No active spec** — review the uncommitted working-tree diff directly. If the
-   working tree is clean, fall back to `main...HEAD` (then `master...HEAD`). If no
-   base can be inferred, ask the user.
+Scope precedence:
 
-Explicit user-provided refs (branch, commit range, PR) always override the above.
+1. Use an explicit user-provided PR, branch, commit, commit range, diff, or file
+   list.
+2. Otherwise review the uncommitted working-tree diff (staged and unstaged).
+3. If the working tree is clean, fall back to `main...HEAD`, then
+   `master...HEAD`.
+4. If no scope can be inferred, ask the user.
 
-When the request is ambiguous (an active spec exists but the user just says
-"review"), ask whether they mean the spec's full changes (case 1) or only the
-uncommitted code (case 2).
+Never discover or interpret another skill's files or conventions. A review
+standard is used only when the user explicitly supplies it or identifies its
+path. Treat it as an ordinary input document and do not require a particular
+filename, directory, ID scheme, heading structure, or commit format.
 
 ## Feature Folder
 
-Derive `<feature>` so the folder is stable and scannable:
+Derive `<feature>` so the folder is stable and scannable, using the first
+available source:
 
-- with an active spec: use the Spec-ID slug, e.g. `S0044-update-compatibility`.
-- no spec: use the branch name or a short sanitized summary of the diff.
+- a user-provided feature name;
+- the branch or commit-range name;
+- a short sanitized summary of the diff.
 
 All artifacts live under `code_review/<feature>/`:
 
@@ -78,9 +72,8 @@ Recommend adding `code_review/` to `.gitignore` if absent. Do not edit
 
 1. **Resolve scope** (above). Run the git commands, then write
    `tmp/review/<feature>/changes.diff` (the full diff) and
-   `code_review/<feature>/scope.md` (human-readable: case, base ref, `git diff
-   --stat`, and — if applicable — the active spec's requirement/acceptance
-   sections quoted as the standard).
+   `code_review/<feature>/scope.md` (human-readable: scope source, base ref,
+   `git diff --stat`, and any user-provided review standard).
 
 2. **Check agent availability.** For each of `codex`, `cursor-agent`:
    `command -v <bin>` and a quick auth probe (`cursor-agent status`; for Codex
@@ -96,8 +89,8 @@ Recommend adding `code_review/` to `.gitignore` if absent. Do not edit
      (both are real files in the repo the agent runs in);
    - apply the embedded review checklist — copy the body of
      [`references/review-checklist.md`](references/review-checklist.md) (P0–P3
-     severities, SOLID/security/quality, plus spec-compliance when scope.md gives
-     a spec standard) directly into the prompt;
+     severities, SOLID/security/quality, plus compliance checks when `scope.md`
+     includes a review standard) directly into the prompt;
    - write its review to `code_review/<feature>/<model>.md` following the embedded
      [`references/templates/review-template.md`](references/templates/review-template.md);
    - reply once, compactly, with no progress chatter (token contract).
@@ -109,10 +102,13 @@ Recommend adding `code_review/` to `.gitignore` if absent. Do not edit
 4. **Fan out in parallel.** Run each external agent via the wrapper, in the
    background, then wait:
 
+   Resolve `MULTI_REVIEW_DIR` to the installed directory containing this
+   `SKILL.md`, then run:
+
    ```bash
-   bash .claude/skills/multi-review/scripts/run_review_agent.sh \
+   bash "$MULTI_REVIEW_DIR/scripts/run_review_agent.sh" \
      codex <feature> tmp/review/<feature>/review.prompt.txt &
-   bash .claude/skills/multi-review/scripts/run_review_agent.sh \
+   bash "$MULTI_REVIEW_DIR/scripts/run_review_agent.sh" \
      cursor <feature> tmp/review/<feature>/review.prompt.txt &
    wait
    ```
@@ -147,9 +143,9 @@ Synthesis rules:
 - preserve genuine disagreement (don't silently drop a single-agent / minority
   finding — label it `仅 <agent> 提出`, lower confidence);
 - order by severity P0 → P3;
-- when a spec standard was used, add a **规格符合性 (Spec Compliance)** section
-  mapping each acceptance criterion / spec item to 满足 / 部分满足 / 未满足 with
-  evidence;
+- when a review standard was supplied, add a **标准符合性 (Standard Compliance)**
+  section mapping its applicable requirements or acceptance criteria to
+  满足 / 部分满足 / 未满足 with evidence;
 - every fixable finding gets an unchecked `[ ]` checkbox — checked means
   "approved to fix" and is the human boundary. This skill never fixes anything;
   it only reviews and reports.

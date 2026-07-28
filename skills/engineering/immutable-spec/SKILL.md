@@ -131,8 +131,8 @@ State rules:
 
 Reference rules:
 - Every spec should include a `References` section.
-- Add only references that materially support execution, such as repository
-  indexes, design docs, API mappings, ADRs, or external requirement documents.
+- Add only references that materially support execution, such as design docs,
+  API mappings, ADRs, or external requirement documents.
 - `References` support the spec; they do not replace the spec's own
   requirement, design, execution, or acceptance sections.
 

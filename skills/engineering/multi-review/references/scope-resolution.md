@@ -1,84 +1,70 @@
 # Scope Resolution
 
-Deterministic git commands behind the three review cases in SKILL.md. Run from the
-repo root. `SPEC_GLOB="docs/specs/*.md"`.
+Deterministic git commands for selecting review input. Run them from the
+repository root.
 
-## Detect the active spec
+## Explicit scope
+
+Explicit user input always wins. Preserve the exact requested semantics:
 
 ```bash
-# Exactly one file directly under docs/specs/ (excludes draft/ and completed/).
-mapfile -t active < <(ls -1 docs/specs/*.md 2>/dev/null)
-if   [ "${#active[@]}" -eq 1 ]; then SPEC="${active[0]}"          # active spec
-elif [ "${#active[@]}" -eq 0 ]; then SPEC=""                       # no active spec
-else echo "WARN: >1 file in docs/specs/ root; ask the user which is active"; fi
+# Commit or branch range supplied by the user.
+git diff --stat "<base>...<head>"
+git diff "<base>...<head>" > "tmp/review/<feature>/changes.diff"
 
-SPEC_FILE="$(basename "${SPEC:-}")"           # e.g. 20260605T1655-S0044-...md
-SPEC_ID="$(sed -nE 's/.*-(S[0-9.]+)-.*/\1/p' <<<"$SPEC_FILE")"   # e.g. S0044
+# Exact two-endpoint diff supplied by the user.
+git diff --stat "<base>" "<head>"
+git diff "<base>" "<head>" > "tmp/review/<feature>/changes.diff"
 ```
 
-## Case 1 — review the spec's changes (committed + uncommitted)
+For a PR, use the provider's read-only PR diff command when available. For an
+explicit file list, add `-- <paths...>` to the selected git diff command.
 
-The immutable-spec convention commits each item as
-`spec(<spec-filename>): <item-id> ...`, so every commit for the spec is grep-able.
+## Uncommitted working tree
+
+When the user does not provide a scope, prefer staged and unstaged changes:
 
 ```bash
-# First commit that referenced this spec file, in chronological order.
-FIRST="$(git log --reverse --grep="$SPEC_FILE" --format=%H | head -1)"
+git diff --stat HEAD
+git diff HEAD > "tmp/review/<feature>/changes.diff"
+```
 
-if [ -n "$FIRST" ]; then
-  BASE="${FIRST}^"                     # parent of the first spec commit
+Do not widen the scope when this diff is non-empty.
+
+## Clean working tree fallback
+
+When the working tree is clean:
+
+```bash
+if git rev-parse --verify main >/dev/null 2>&1; then
+  BASE=main
+elif git rev-parse --verify master >/dev/null 2>&1; then
+  BASE=master
 else
-  # Spec active but nothing committed yet -> base is current HEAD; scope is
-  # whatever is in the working tree.
-  BASE="HEAD"
+  echo "No uncommitted changes and no main/master base; ask the user for a scope."
 fi
 
-# Full scope: every change since BASE, INCLUDING uncommitted working tree.
-git diff --stat "$BASE"
-git diff "$BASE"            > tmp/review/<feature>/changes.diff   # the review diff
+git diff --stat "${BASE}...HEAD"
+git diff "${BASE}...HEAD" > "tmp/review/<feature>/changes.diff"
 ```
 
-Notes:
-- `git diff $BASE` (no second ref) compares BASE against the working tree, so it
-  captures committed spec work *and* current uncommitted edits in one diff.
-- If the spec touched files later reverted, the net diff still reflects final state.
-- Always include the spec file itself; quote its `Requirement Details`,
-  `Execution Plan`, and `Test and Acceptance Criteria` into `scope.md` as the
-  acceptance standard.
+## Optional review standard
 
-## Case 2 — review the uncommitted code (spec as standard)
+Use a requirement, design, acceptance, or policy document only when the user
+supplies it or explicitly identifies its path. Record the path and relevant
+content in `code_review/<feature>/scope.md`.
 
-```bash
-git diff --stat HEAD                       # unstaged + staged vs HEAD
-git diff HEAD > tmp/review/<feature>/changes.diff
-```
-
-- Do not widen to committed history. The diff target is only the working tree.
-- If an active spec exists, still quote its requirement/acceptance sections into
-  `scope.md` as the **standard** the uncommitted code is judged against.
-- If `git diff HEAD` is empty, tell the user there is nothing uncommitted to review.
-
-## Case 3 — no active spec
-
-```bash
-if ! git diff --quiet HEAD; then
-  git diff HEAD > tmp/review/<feature>/changes.diff               # uncommitted
-else
-  BASE=main; git rev-parse --verify main >/dev/null 2>&1 || BASE=master
-  git rev-parse --verify "$BASE" >/dev/null 2>&1 \
-    && git diff "${BASE}...HEAD" > tmp/review/<feature>/changes.diff \
-    || echo "No uncommitted changes and no main/master base — ask the user for a base ref."
-fi
-```
+Do not scan conventional directories, infer document state, parse project-local
+IDs, or derive commit ranges from document names. The standard constrains the
+review criteria; it does not change the review scope unless the user explicitly
+says so.
 
 ## Feature slug
 
+Use a user-provided feature name when available. Otherwise derive a filesystem-
+safe name from the explicit branch/range or current branch:
+
 ```bash
-if [ -n "$SPEC_ID" ]; then
-  SLUG="$(sed -nE 's/.*-S[0-9.]+-(.*)\.md/\1/p' <<<"$SPEC_FILE")"
-  FEATURE="${SPEC_ID}-${SLUG}"                 # e.g. S0044-update-compatibility-foundation
-else
-  FEATURE="$(git rev-parse --abbrev-ref HEAD | tr '/' '-')"   # branch name
-fi
+FEATURE="$(git rev-parse --abbrev-ref HEAD | tr '/ ' '--')"
 mkdir -p "tmp/review/$FEATURE" "code_review/$FEATURE"
 ```
