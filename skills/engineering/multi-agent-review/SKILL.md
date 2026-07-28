@@ -1,6 +1,7 @@
 ---
 name: multi-agent-review
-description: Orchestrate a multi-agent code review where Claude is the primary agent and Codex + Cursor run as headless reviewers, each writing one review file, then Claude synthesizes a single checklist summary. Use when the user asks to review current changes, review the active spec's changes, or get a multi-model/second-opinion code review. Integrates with immutable-spec-delivery (active spec in docs/specs/) but also works with no active spec.
+description: Run a multi-agent code review with Claude, Codex, and Cursor, then synthesize one human-controlled checklist summary.
+disable-model-invocation: true
 ---
 
 # Multi-Agent Review
