@@ -1,0 +1,4 @@
+interface:
+  display_name: "Adversarial Solution Review"
+  short_description: "Challenge whether a proposed solution is worth building"
+  default_prompt: "Use $adversarial-solution-review to challenge this proposal before implementation."
