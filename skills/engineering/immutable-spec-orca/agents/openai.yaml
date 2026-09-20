@@ -1,0 +1,4 @@
+interface:
+  display_name: "Immutable Spec Orca"
+  short_description: "Activate an immutable task spec and hand off full delivery"
+  default_prompt: "Use $immutable-spec-orca to claim a task, refine and activate its immutable spec, then hand full delivery ownership to one Orca worktree agent and stop after prompt acceptance."
