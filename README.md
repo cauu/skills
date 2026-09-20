@@ -58,6 +58,10 @@ Each skill remains a standalone installation unit. A skill may optionally read
 ordinary project artifacts produced by another workflow, but it must not require
 another skill to be installed unless its own documentation says so.
 
+For a Chinese overview of the skills and the recommended AI engineering
+workflow, see
+[AI 工程 Skills 与工作流概览](./docs/ai-engineering-workflow-overview.md).
+
 ## Engineering Skills
 
 ### User-invoked

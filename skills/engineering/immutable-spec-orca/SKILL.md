@@ -1,6 +1,6 @@
 ---
 name: immutable-spec-orca
-description: Activate task-scoped append-only specs and hand full delivery ownership to one Codex agent in an Orca worktree. Use when a real Task-ID must remain traceable from claim through implementation, integration, and closure, while the activating agent must stop after a verified full handoff. Do not use for supervised workers, coordinator loops, or ordinary single-agent work without a task claim.
+description: Activate task-scoped append-only specs and hand full delivery ownership to one execution agent in an Orca worktree, using Codex by default or an explicitly user-selected agent/model. Use when a real Task-ID must remain traceable from claim through implementation, integration, and closure, while the activating agent must stop after a verified full handoff. Do not use for supervised workers, coordinator loops, or ordinary single-agent work without a task claim.
 ---
 
 # Immutable Spec Orca
@@ -103,11 +103,31 @@ The Activation Owner:
 1. Claims and reads the task.
 2. Creates the draft using the exact Task-ID.
 3. Clarifies requirements, constraints, non-goals, design, items, and acceptance criteria with the user.
-4. Confirms one worktree owner can deliver the task.
+4. Resolves the execution agent and model, then confirms one worktree owner can deliver the task.
 5. On user approval, moves the spec to `docs/specs/active/`, sets `Status: active`, records Start Time, Activation Owner, and Target Branch, then commits only the activation state.
 6. Captures that exact activation commit as the worktree base.
 
 User approval to activate authorizes the full handoff and authorizes the Worktree Owner to integrate and close the task after every spec gate passes, unless the user explicitly requires another review gate.
+
+### Execution agent selection
+
+- Use Codex with the environment's configured defaults when the user has not
+  selected an execution agent or model.
+- An explicit user selection of another supported agent, model, or reasoning
+  mode overrides the Codex default. Follow that selection exactly; do not
+  silently substitute Codex or another launcher.
+- Before activating the spec, use the version-matched `orca-cli` guidance to
+  verify that the selected launcher, authentication, and requested model or
+  mode are available. If they are unavailable or ambiguous, stop before
+  activation and ask the user how to proceed.
+- A non-Codex Worktree Owner has the same ownership, spec, evidence, commit,
+  integration, task-closure, and stop-after-handoff obligations defined by
+  this skill. Agent selection never changes the one-owner invariant or turns
+  the workflow into supervised orchestration.
+- Use Orca's documented built-in `--agent` path when it preserves the user's
+  selection. When an exact model or mode requires custom launcher arguments,
+  use the documented custom-command full-handoff path and verify TUI readiness
+  before sending the prompt.
 
 ## Full Handoff Through Orca
 
