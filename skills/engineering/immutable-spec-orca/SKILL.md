@@ -115,7 +115,7 @@ The Activation Owner:
 
 1. Claims and reads the task.
 2. Creates the draft using the exact Task-ID.
-3. Clarifies requirements, constraints, non-goals, design, items, and acceptance criteria with the user.
+3. Clarifies requirements, constraints, non-goals, design, items, and acceptance criteria with the user. When the `spec-design` skill is installed, follow it for this step, through its gate B request. When it is not installed, do this step directly.
 4. Resolves the execution agent and model, then confirms one worktree owner can deliver the task.
 5. Runs `spec-lint --stage activate` on the draft, fixes every error, and lists every `manual` TC to the user with the activation request.
 6. On user approval, appends the gate B line, moves the spec to `docs/specs/active/`, sets `Status: active`, records Start Time, Activation Owner, and Target Branch, then commits only the activation state.

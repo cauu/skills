@@ -1,0 +1,6 @@
+interface:
+  display_name: "Spec Design"
+  short_description: "Clarify, prototype, and design a draft spec up to activation"
+  default_prompt: "Use $spec-design to take this draft spec or task through requirements, design, and acceptance criteria, stopping for my decision at gate A and gate B."
+policy:
+  allow_implicit_invocation: false

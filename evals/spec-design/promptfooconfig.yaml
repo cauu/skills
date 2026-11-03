@@ -1,0 +1,133 @@
+description: spec-design behavior cases
+providers: file://../lib/claude-provider.yaml
+extensions:
+- file://../lib/hooks.cjs:extensionHook
+prompts:
+- '{{task}}'
+tests:
+- description: without a spec system the design goes into the task
+  vars:
+    fixture: no-spec-task
+    task: Use the spec-design skill at .claude/skills/spec-design/SKILL.md. I have claimed task T-12 (docs/tasks/T-12-notes-search.md). Start the design.
+  options:
+    repeat: 1
+  metadata:
+    caseId: spec-design.no-spec-writes-task
+    repeat: 1
+    minPassRate: 1.0
+    behavior: with no other skill installed and no spec system in the project, the design output is written into the task or a design document, no spec is created, and product code is untouched
+    regressionRisk: the skill only works next to immutable-spec, or it invents a spec format the project does not use, or its output lives only in chat and is lost
+    knownOmissions:
+    - whether the content written is a good restatement (needs judgment)
+    - a task system the agent cannot write to
+  assert:
+  - type: javascript
+    value: file://assert/no-spec-writes-task.cjs
+- description: a vague draft stops at gate A
+  vars:
+    fixture: vague-draft
+    task: Use the spec-design skill at .claude/skills/spec-design/SKILL.md. Take draft spec S0003 as far as you can.
+  options:
+    repeat: 1
+  metadata:
+    caseId: spec-design.stop-at-gate-a
+    repeat: 1
+    minPassRate: 1.0
+    behavior: before the user confirms requirements, no technical design or acceptance criteria are written, gate A is not recorded as passed, and the agent asks the user
+    regressionRisk: the agent designs against requirements nobody confirmed, and the user is presented with a finished design instead of a decision
+    knownOmissions:
+    - whether questions the code could answer were answered from the code rather than asked
+    - the quality of the restatement in section 1
+  assert:
+  - type: javascript
+    value: file://assert/stop-at-gate-a.cjs
+- description: a runnable question is settled by running a prototype
+  vars:
+    fixture: prototype-question
+    task: Use the spec-design skill at .claude/skills/spec-design/SKILL.md. Gate A for draft spec S0003 has passed. Continue the design.
+  options:
+    repeat: 1
+  metadata:
+    caseId: spec-design.prototype-decides
+    repeat: 1
+    minPassRate: 1.0
+    behavior: a question that a run can answer is settled by a throwaway prototype outside product code, and the spec quotes the output that decided it
+    regressionRisk: design decisions rest on guesses about what the code or data does, and the evidence is lost with the scratch directory
+    knownOmissions:
+    - where the prototype was placed (only product code is checked)
+    - whether the agent then chose 8 characters (the quoted output is the decisive signal)
+  assert:
+  - type: javascript
+    value: file://assert/prototype-decides.cjs
+- description: a layout question goes to the user with a comparison page
+  vars:
+    fixture: preference-question
+    task: Use the spec-design skill at .claude/skills/spec-design/SKILL.md. Gate A for draft spec S0003 has passed. Continue the design.
+  options:
+    repeat: 1
+  metadata:
+    caseId: spec-design.preference-to-user
+    repeat: 1
+    minPassRate: 1.0
+    behavior: a preference question is shown as variants on one throwaway page, with a recommendation, and left for the user to pick; the real page is not changed
+    regressionRisk: the agent makes product and layout choices that belong to the user, or edits the product to show options
+    knownOmissions:
+    - whether the page really switches between the variants (only its existence and content are checked)
+    - whether the spec records a choice the user has not made (needs judgment)
+  assert:
+  - type: javascript
+    value: file://assert/preference-to-user.cjs
+- description: the technical design compares at least two shapes
+  vars:
+    fixture: design-ready
+    task: Use the spec-design skill at .claude/skills/spec-design/SKILL.md. Gate A for draft spec S0003 has passed. Continue the design.
+  options:
+    repeat: 1
+  metadata:
+    caseId: spec-design.two-designs
+    repeat: 1
+    minPassRate: 1.0
+    behavior: the design in section 2 shows the caller's usage and records at least one rejected design with its reason
+    regressionRisk: the first idea ships unexamined, and later readers cannot tell which alternatives were weighed
+    knownOmissions:
+    - whether the rejected design is structurally different rather than a variant (needs judgment)
+    - whether the red-flag screening and challenge step happened
+  assert:
+  - type: javascript
+    value: file://assert/two-designs.cjs
+- description: TCs get runnable methods and activation is requested, not taken
+  vars:
+    fixture: plan-needs-methods
+    task: Use the spec-design skill at .claude/skills/spec-design/SKILL.md. Gate A for draft spec S0003 has passed and the design is written. Finish S0003 so it is ready to activate.
+  options:
+    repeat: 1
+  metadata:
+    caseId: spec-design.gate-b-plan
+    repeat: 1
+    minPassRate: 1.0
+    behavior: before gate B every TC has one runnable method and every item maps to TCs, so the activation lint passes; the agent asks for gate B and does not activate
+    regressionRisk: specs reach delivery without a way to accept the work, or the agent activates without the user's decision
+    knownOmissions:
+    - whether each method meets the feature evidence gate in substance (needs judgment)
+    - the user approving at gate B
+  assert:
+  - type: javascript
+    value: file://assert/gate-b-plan.cjs
+- description: a complex bug brings reproduction and root cause to gate A
+  vars:
+    fixture: bug-draft
+    task: Use the spec-design skill at .claude/skills/spec-design/SKILL.md. Work on bug draft S0003.
+  options:
+    repeat: 1
+  metadata:
+    caseId: spec-design.bug-gate-a
+    repeat: 1
+    minPassRate: 1.0
+    behavior: for a complex bug the spec records the real reproduction output verbatim and the root cause with file:line, nothing is fixed, and the user confirms both at gate A
+    regressionRisk: bugs are fixed from a guessed cause, or the fix starts before the user agrees on what is broken
+    knownOmissions:
+    - a bug that does not reproduce
+    - whether the named root cause is the right one (the line is checked to exist in the text, not judged)
+  assert:
+  - type: javascript
+    value: file://assert/bug-gate-a.cjs

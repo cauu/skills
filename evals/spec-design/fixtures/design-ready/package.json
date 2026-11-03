@@ -1,0 +1,10 @@
+{
+  "name": "notes",
+  "private": true,
+  "bin": {
+    "notes": "bin/notes.js"
+  },
+  "scripts": {
+    "start": "node src/server.js"
+  }
+}

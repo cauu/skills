@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Notes</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="toolbar">
+    <h1>Notes</h1>
+    <button id="new-note">New note</button>
+    <button id="settings-toggle" aria-haspopup="menu">Settings</button>
+    <ul id="settings-menu" role="menu" hidden>
+      <li role="menuitem">Theme</li>
+      <li role="menuitem">Sort order</li>
+    </ul>
+  </header>
+  <main><ul id="notes"></ul></main>
+  <script src="app.js"></script>
+</body>
+</html>

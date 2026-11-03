@@ -1,0 +1,7 @@
+{
+  "name": "shop",
+  "private": true,
+  "bin": {
+    "cart": "bin/cart.js"
+  }
+}

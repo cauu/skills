@@ -1,0 +1,8 @@
+{
+  "id": "1042",
+  "items": [
+    { "sku": "mug", "price": 12.49, "qty": 3 },
+    { "sku": "tea", "price": 7.35, "qty": 2 }
+  ],
+  "shipping": 4.9
+}

@@ -9,7 +9,8 @@
     "eval:immutable-spec": "evals/run.sh immutable-spec",
     "eval:challenge": "evals/run.sh challenge",
     "eval:tdd": "evals/run.sh tdd",
-    "eval:code-review": "evals/run.sh code-review"
+    "eval:code-review": "evals/run.sh code-review",
+    "eval:spec-design": "evals/run.sh spec-design"
   },
   "devDependencies": {
     "promptfoo": "0.122.0"
