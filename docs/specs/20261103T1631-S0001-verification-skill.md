@@ -141,7 +141,7 @@ p1 交付 skill 文本，用静态检查（TC-1、TC-8）验收；skill 的行�
 - [x] p1-1 调研 Claude Code、Codex、Cursor 项目级 skill 的发现路径，确定产物根目录（D1），把决策追加到 Execution Log → TC-8
 - [x] p1-2 编写 `references/drive-contract.md` → TC-1
 - [x] p1-3 编写 SKILL.md 的 create → TC-1
-- [ ] p1-4 编写 SKILL.md 的 maintain（局部和全量） → TC-1
+- [x] p1-4 编写 SKILL.md 的 maintain（局部和全量） → TC-1
 - [x] p1-5 编写 `references/feature-map-example/`（含 `Source entry points`） → TC-1
 - [ ] p1-6 补充 `agents/openai.yaml`，更新 README（工作流概览由用户维护，本 spec 不修改） → TC-1
 - [ ] p1-7 用 case designer 设计 `evals/verification/` 用例，先不调用 agent 验证用例本身，经用户审核后再实际运行 → TC-9, TC-10, TC-11, TC-12
@@ -214,11 +214,16 @@ TC-2 至 TC-7 在试点项目上运行，试点项目由用户在 p2 开始前�
 
 - 2026-11-03 p1-3 completed：`skills/engineering/verification/SKILL.md`：三种用法、D1 产物布局与包装模板、修改范围、create 七步。决定：主体首行 `Last full run:` 记录最近一次完整运行的 run-id，没跑通时写 `none (draft: <卡住的步骤和原因>)`，草稿不提交，这样“没运行过的只算草稿”可以从文件上直接看出来；只能修环境问题，改产品代码要用户同意；伪造应用自己的部件（如数据库）不算替代环境。frontmatter 设 `disable-model-invocation: true`（用户手动调用）。
 
+- 2026-11-03 p1-4 started。
+
+- 2026-11-03 p1-4 completed：SKILL.md 新增 `maintain`：共用规则（定位工具、修改范围、三类问题的分诊和区分“有意改动”与“回归”的依据、驱动的三条不变式、结论 `clean`/`changed`/`blocked`），`maintain --scope` 五步（按 `Source entry points` 匹配 diff、识别新入口、只驱动受影响和新增的功能），`maintain` 全量五步。`structure.sh skill` 增加章节和三个结论词的检查。
+
 ## 6. Validation Evidence (append-only)
 
 - 2026-11-03 TC-8 | type: feature | method: command | command: tests/verification/layout.sh | exit: 0 | output: "ok claude-wrapper-only: update required (exit 1)", "ok agents-wrapper-only: update required (exit 1)", "ok both-wrappers: update required (exit 1)", "ok body-without-wrapper: ok (exit 0)", "verification layout: 0 failure(s)" | result: pass | note: runs the real spec-lint --stage close against temporary repos laid out per D1
 - 2026-11-03 TC-1 | type: feature | method: command | command: tests/verification/structure.sh contract | exit: 0 | output: "ok result words: pass fail inconclusive unreachable", contract mentions .verify-artifacts/<run-id>/<feature-id>/, gitignore, --dry-run, JSON, --help, run-id; "verification structure (contract): 0 failure(s)"; mutation (unreachable -> verified-unreachable) gives "FAIL result words are 'pass fail inconclusive verified-unreachable'" | result: pass | note: contract part only (p1-2); the four words match immutable-spec SKILL.md lines 350-353
 - 2026-11-03 TC-1 | type: feature | method: command | command: tests/verification/structure.sh feature-map | exit: 0 | output: "ok five H2s in order" for create-note.md and export.md, "ok indexed" for both, "ok 2 feature files", "verification structure (feature-map): 0 failure(s)"; mutation (Source entry points -> Source files) gives "FAIL H2s in .../export.md" | result: pass | note: feature-map part only (p1-5)
 - 2026-11-03 TC-1 | type: feature | method: command | command: tests/verification/structure.sh skill | exit: 0 | output: "ok name: verification", "ok description present", "ok link SKILL.md -> references/drive-contract.md", "ok link SKILL.md -> references/feature-map-example/README.md", "ok SKILL.md requires no other skill", "ok no placeholders", "verification structure (skill): 0 failure(s)"; mutation (appended "Requires the immutable-spec skill" and a link to references/missing.md) gives 2 failures | result: pass | note: skill part only (p1-3, create section)
+- 2026-11-03 TC-1 | type: feature | method: command | command: tests/verification/structure.sh skill | exit: 0 | output: "ok section: ## create", "ok section: ## maintain", "ok section: ### maintain --scope <diff>", "ok section: ### maintain (full)", "ok maintain outcomes: clean changed blocked", "verification structure (skill): 0 failure(s)"; mutation (blocked -> stuck) gives "FAIL maintain outcomes are 'clean changed stuck'" | result: pass | note: skill part (p1-4); maintain behavior is accepted by TC-11, TC-12 and TC-6, TC-7
 
 ## 7. Change Requests (append-only)

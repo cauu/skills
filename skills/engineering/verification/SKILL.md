@@ -63,3 +63,39 @@ The tool's files are the body, the wrappers, and the `.verify-artifacts/` line i
 5. **Prove it before handing it over.** Run the tool's own instructions: Launch, Doctor, drive one mapped feature, capture evidence, Cleanup, then confirm the evidence still exists at its location. When a step fails, fix the tool, run Cleanup, and retry. Then set `Last full run:` to the run-id. A tool that never completed this run is a draft: keep `Last full run: none (draft: ...)`, do not commit it, and report it as a draft with the failed step and what it needs.
 6. **Name what a stand-in skipped.** If the run used a stand-in for the real target (a container for a fresh machine, a local chain for a testnet), list every step the stand-in did that the target will not; those stay unverified. Replacing a part the app owns, such as its database, with a fake is not a stand-in.
 7. **Hand over.** Commit the tool's files in one commit, without evidence. Report the tool path, the mapped features, the run-id and evidence path, and anything unverified.
+
+## maintain
+
+Both forms share these rules:
+
+- **Find the tool.** Look for `verify-*` wrappers in the agent skill directories at the project root, and the body they point to. None: stop and suggest `create`. Several: ask which one.
+- **Edit scope.** Only the tool's files. Never product code.
+- **Triage** every mismatch between the tool and the app:
+  - doc drift, the app changed on purpose: fix the feature file;
+  - harness gap, the app works but the recipe cannot drive it: fix the recipe or script, then drive it again;
+  - product regression, the app does not do what the project intends: report it with evidence, and change neither the product nor the tool to match it.
+
+  The change is on purpose when a commit, spec, changelog, or the feature's other entry points agree with the new behavior. It is a regression when the project's stated intent (spec, README, tests, other entry points) still says otherwise. When you cannot tell, report it as a possible regression and ask.
+- **Drive** per the tool's Launch model and its drive contract. Whatever fails, keep three invariants: run Doctor before the first drive and after any failed drive; evidence survives every cleanup, checked at its location; nothing a drive started outlives the run. If Doctor fails because the tool is out of date, fix it and retry once before calling the pass `blocked`.
+- **Outcome**, exactly one:
+  - `clean`: everything driven matched. No edits, no commit.
+  - `changed`: proven corrections to the tool. Re-read every changed file, set `Last full run:` to this run, and commit once.
+  - `blocked`: the pass could not finish, or a fix could not be proven. Say what blocked it.
+
+  Report the outcome, each feature driven with its result, and every product regression.
+
+### maintain --scope <diff>
+
+1. List the changed paths (`git diff --name-only <range>`, or the paths given).
+2. A feature is affected when a changed path appears in its `Source entry points`. A user-facing entry point added by the diff (route, command, flag, menu item, screen) that no feature covers is a new feature. A changed path that matches nothing and adds no entry point affects nothing; say so.
+3. Update the affected features' recipes and `Source entry points`. Add a file and an index entry for each new feature.
+4. Drive every affected and new feature once. Do not drive or edit any other feature; an unmapped dependency missed here is caught by the full pass.
+5. When the run belongs to a spec, append one evidence line per driven feature to that spec's validation evidence, in the spec's format.
+
+### maintain (full)
+
+1. **Index.** Fix missing, extra, duplicate, or dead entries in `features/README.md`.
+2. **Read the source per feature.** Use one read-only subagent per feature file when the harness has subagents; otherwise read them in turn. Each returns a summary, the source entry points, likely drift with file citations, and one recipe to drive the feature. Readers never drive the app or edit files.
+3. **Reconcile.** Merge the recipes into as few app states as practical. Spot-check cited drift. Check changes since `Last full run:` for user-facing entry points the map lacks; name a concrete source path before calling one missing.
+4. **Drive every feature at least once,** even when the source looks clean. A feature is `unreachable` only with the missing prerequisite and the path tried; if the map omits that prerequisite, that is drift.
+5. **Triage and finish** as above.

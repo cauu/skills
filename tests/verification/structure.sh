@@ -65,6 +65,13 @@ check_skill() {
     bad "SKILL.md requires another skill"
   else ok "SKILL.md requires no other skill"; fi
   grep -nE '\b(TODO|TBD|FIXME)\b' "$f" && bad "placeholder in SKILL.md" || ok "no placeholders"
+  local heading
+  for heading in '## Generated layout' '## create' '## maintain' '### maintain --scope <diff>' '### maintain (full)'; do
+    grep -qxF "$heading" "$f" && ok "section: $heading" || bad "missing section: $heading"
+  done
+  local outcomes
+  outcomes="$(awk '/^- \*\*Outcome\*\*/{on=1; next} on && /^  - `[a-z]+`/{print} on && /^- /{on=0}' "$f" | sed -E 's/^  - `([a-z]+)`.*/\1/' | tr '\n' ' ' | sed 's/ $//')"
+  [ "$outcomes" = "clean changed blocked" ] && ok "maintain outcomes: $outcomes" || bad "maintain outcomes are '$outcomes', want 'clean changed blocked'"
 }
 
 check_meta() {
