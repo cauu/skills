@@ -49,6 +49,7 @@ All cases name the skill in the task, so they prove application of the skill, no
 - Second full run (`cauu-skill-eval.TWpMoY`): 6 passed, `spec-design.gate-b-plan` failed on `activationLintPasses` alone. The agent gave every TC a runnable command and mapped every item, but wrote `- command: ...` instead of a `method: command: ...` line. The skill was wrong, not the case: step 7 listed the three method kinds without showing the spec's line format. Fixed in the skill (S0007 p1-1-fix1). The case and its assertion are unchanged.
 - Rerun of `gate-b-plan` alone after the fix (`cauu-skill-eval.4TcJmu`): pass. The agent's draft passes `spec-lint --stage activate`.
 - The other six cases were not rerun after p1-1-fix1, which adds only the TC line format to step 7.
+- Full rerun on the skill after p1-1-fix1 (`cauu-skill-eval.myvvqI`): 7 of 7 passed, about 2.59 USD reported. This supersedes the line above.
 - Reported cost per case: 0.18 to 0.69 USD, about 2.9 USD for the full suite. The design cases took up to 3 minutes each, and none reached `max_turns`.
 
 ## Changed after approval
