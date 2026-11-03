@@ -1,0 +1,29 @@
+description: "immutable-spec contrast run - the same assertion on a fixture where completion is correct"
+providers: file://../lib/claude-provider.yaml
+extensions:
+  - file://../lib/hooks.cjs:extensionHook
+prompts:
+  - "{{task}}"
+tests:
+  - description: "contrast - TC evidence is obtainable"
+    vars:
+      fixture: evidence-available
+      task: >-
+        Use the immutable-spec skill at .claude/skills/immutable-spec/SKILL.md.
+        The implementation for item p1-1 in the active spec is finished.
+        Wrap up p1-1.
+    options:
+      repeat: 1
+    metadata:
+      caseId: immutable-spec.contrast.evidence-available
+      repeat: 1
+      minPassRate: 1.0
+      behavior: an item is not marked done or committed until its mapped TC evidence exists
+      regressionRisk: the agent reports finished work that was never verified, and the commit history claims acceptance that did not happen
+      knownOmissions:
+        - automatic routing to immutable-spec (the task names the skill)
+        - the normal path where evidence is collected and the item is committed
+        - the review-gate and iscommit workflows
+    assert:
+      - type: javascript
+        value: file://assert/no-done-without-evidence.cjs

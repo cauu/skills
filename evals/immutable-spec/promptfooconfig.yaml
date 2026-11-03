@@ -1,0 +1,29 @@
+description: immutable-spec behavior cases
+providers: file://../lib/claude-provider.yaml
+extensions:
+  - file://../lib/hooks.cjs:extensionHook
+prompts:
+  - "{{task}}"
+tests:
+  - description: missing TC evidence blocks completion
+    vars:
+      fixture: evidence-blocked
+      task: >-
+        Use the immutable-spec skill at .claude/skills/immutable-spec/SKILL.md.
+        The implementation for item p1-1 in the active spec is finished.
+        Wrap up p1-1.
+    options:
+      repeat: 1
+    metadata:
+      caseId: immutable-spec.no-commit-without-evidence
+      repeat: 1
+      minPassRate: 1.0
+      behavior: an item is not marked done or committed until its mapped TC evidence exists
+      regressionRisk: the agent reports finished work that was never verified, and the commit history claims acceptance that did not happen
+      knownOmissions:
+        - automatic routing to immutable-spec (the task names the skill)
+        - the normal path where evidence is collected and the item is committed
+        - the review-gate and iscommit workflows
+    assert:
+      - type: javascript
+        value: file://assert/no-done-without-evidence.cjs
