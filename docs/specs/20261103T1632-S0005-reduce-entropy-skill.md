@@ -46,7 +46,7 @@ SKILL.md 分“扫描”和“处理”两段，输出熵源清单、每项处�
 - [x] p1-1 编写 SKILL.md（内联 refactor 门槛） → TC-1, TC-2, TC-3, TC-4
 - [x] p1-2 补充 `agents/openai.yaml`，更新 README → none (reason: 元数据和文档，不改变 agent 行为)
 - [x] p1-3 用 case designer 设计 `evals/reduce-entropy/` 中 TC-1 至 TC-3 的用例，新增 `npm run eval:reduce-entropy`；**先经用户审核，再实际运行** → TC-1, TC-2, TC-3
-- [ ] p2-1 在一个真实项目上试运行一次（项目由用户之后指定） → TC-5, TC-6, TC-7
+- [~] p2-1 在一个真实项目上试运行一次（项目由用户之后指定） → TC-5, TC-6, TC-7
 
 ## 4. Test and Acceptance Criteria
 
@@ -88,6 +88,9 @@ SKILL.md 分“扫描”和“处理”两段，输出熵源清单、每项处�
 - 2026-11-03 第一次全量运行（`npm run eval:reduce-entropy`，Node 24.12.0）：3 个用例全部通过，退出码 0，耗时 3 分 37 秒，Claude Code 报告标价折算约 0.89 USD（0.21 + 0.43 + 0.25）。没有用例失败，skill 和用例都未修改；没有触到 40 轮上限。
 - 2026-11-03 p1-3 completed：3 个用例（用户已审核）、断言、fixture 与 case-review.md；TC-1 至 TC-3 有通过证据。
 - 2026-11-03 p1-1 completed：TC-1 至 TC-3 由第一次全量运行通过，TC-4 已通过；SKILL.md 自 TC-4 证据以来未改动，复跑 `check-skill-consistency.py`（ok: 4 gates, 8 skills）、`tests/consistency/run.sh`（0 failure(s)）、副本门槛变异（exit 1）结果相同；`tests/spec-lint/run.sh` 0 failure(s)。不需要修复条目。
+- 2026-11-03 p2-1 用户批准试运行：项目 bubble-hub，只限 `server/`，在新分支上进行，不合并、不推送。决定人：用户。
+- 2026-11-03 p2-1 started：`git -C bubble-hub worktree add /tmp/pilots/bubble-hub-reduce-entropy -b pilot/reduce-entropy dev`（dev 在 ed2b02d），Node 22.21.1、pnpm 10.29.2，`pnpm install --frozen-lockfile` 成功；主 checkout 未改动。
+- 2026-11-03 p2-1 基线不通过，按约定停止，未运行 skill：`pnpm --dir server exec eslint "{src,test}/**/*.ts"`（不带 --fix）退出 1，49 个错误全部是 prettier/prettier，集中在 cardano 模块和 `rss-http.client.spec.ts`；`pnpm --dir server test` 退出 1，"Tests: 1 failed, 85 skipped, 609 passed, 695 total"，失败的是 `src/modules/cardano/cardano-persistence-style.spec.ts`（原始 SQL 白名单），实际多出 `services/cardano-single-pool-candidate.service.ts`（第 76 行 `this.dataSource.query(sql, params)`，来自 cf89f0c/7543aab），是 dev 上确定性的失败，与 worktree 路径无关；`pnpm --dir server build` 退出 0。TC-5 至 TC-7 没有运行，没有证据行。pilot 分支 `pilot/reduce-entropy` 没有新提交，worktree 保留。继续之前需要用户决定：先在 bubble-hub 修好基线（走 bubble-hub 自己的流程），或接受把这两项已知失败作为基线照常试运行，或换一个基线通过的项目。
 
 ## 6. Validation Evidence (append-only)
 
