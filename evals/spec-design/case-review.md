@@ -2,11 +2,11 @@
 
 This file is repository evaluation source and is not installed with the skill.
 
-Status: **designed, not yet approved, never run.** Seven cases added for S0007 (TC-2 to TC-7). Run them only after the user approves them: `npm run eval:spec-design`.
+Status: the seven cases added for S0007 (TC-2 to TC-7) were approved by the user on 2026-11-03 ("按建议"), including every judgment below and the skill's three defaults (user-invoked only, `.scratch/` for prototypes, `docs/design/` fallback). Run with `npm run eval:spec-design`.
 
 All cases name the skill in the task, so they prove application of the skill, not automatic routing to it (the skill is user-invoked anyway). Each runs once and requires 100%. All assertions are deterministic. No LLM judge is used. Only `spec-design` is installed in each workspace, so every case also runs without `immutable-spec`, `challenge`, or `codebase-design`.
 
-## Added for S0007 (pending approval)
+## Added for S0007 (approved)
 
 | caseId | TC | Fixture | Task (after naming the skill) | Pass requires | Rejected outcomes |
 |---|---|---|---|---|---|
@@ -43,7 +43,21 @@ All cases name the skill in the task, so they prove application of the skill, no
 - Leak check: 36 tokens (every assertion check name and file name, `763b4e`, `47.157700000000006`, `47.1577`, "recommend", "gate B passed", "Rejected designs", "Caller", "Decisions settled", `cart.js:`) searched in all 7 tasks and 43 fixture files. The only hits are the template headings inside `plan-needs-methods`, whose draft already has a finished design; that case's assertion does not check those headings. The colliding ids appear only in `prototype-question/data/notes.json`, as data.
 - Config: the YAML parses, there are 7 unique `caseId`s, `repeat` equals `metadata.repeat`, and every fixture and assertion path exists.
 
-Pending: user approval, then one real run.
+## Runs (2026-11-03)
+
+- First full run: cut off by the Claude usage limit. 5 passed; `plan-needs-methods` and `bug-draft` errored with "You've hit your 5-hour limit". This was an infrastructure stop, and the run was discarded.
+- Second full run (`cauu-skill-eval.TWpMoY`): 6 passed, `spec-design.gate-b-plan` failed on `activationLintPasses` alone. The agent gave every TC a runnable command and mapped every item, but wrote `- command: ...` instead of a `method: command: ...` line. The skill was wrong, not the case: step 7 listed the three method kinds without showing the spec's line format. Fixed in the skill (S0007 p1-1-fix1). The case and its assertion are unchanged.
+- Rerun of `gate-b-plan` alone after the fix (`cauu-skill-eval.4TcJmu`): pass. The agent's draft passes `spec-lint --stage activate`.
+- The other six cases were not rerun after p1-1-fix1, which adds only the TC line format to step 7.
+- Reported cost per case: 0.18 to 0.69 USD, about 2.9 USD for the full suite. The design cases took up to 3 minutes each, and none reached `max_turns`.
+
+## Changed after approval
+
+- None. No case, fixture, or assertion was changed.
+
+## Observations
+
+- `prototype-decides`: after running the prototype, the agent also pointed out that 7–8 character hex codes are longer than the existing ids (`n` plus five digits), which defeats the draft's goal of something easy to read aloud. It recommended changing the requirement and stopped there. This is the restate rule in step 1 working, and the case passed. It also shows the fixture's premise is weak. A future revision could use long ids. Left unchanged, because the case's intent holds.
 
 ## Cost of one full suite run
 
