@@ -84,7 +84,12 @@ workflow, see
   the code as the source of truth.
 - **[immutable-spec](./skills/engineering/immutable-spec/SKILL.md)** — Execute
   delivery from an append-only active specification with item-level traceability,
-  validation evidence, and commits.
+  validation evidence, and commits. Every spec declares a change type with its
+  evidence gate and gives each acceptance check a method the agent runs itself;
+  `scripts/spec-lint` checks these rules before activation and closure.
+- **[immutable-spec-orca](./skills/engineering/immutable-spec-orca/SKILL.md)** —
+  Activate a task-scoped spec and hand full delivery ownership to one agent in an
+  Orca worktree. Requires `immutable-spec`.
 - **[tdd](./skills/engineering/tdd/SKILL.md)** — Develop one vertical behavior
   slice at a time through pre-agreed seams using a test-first red → green loop.
   When an active immutable spec exists, use it as the behavior and acceptance
@@ -100,12 +105,22 @@ skills/
     ├── codebase-design/
     ├── codebase-map/
     ├── immutable-spec/
+    ├── immutable-spec-orca/
     └── tdd/
 ```
 
 Every distributable skill is a directory containing a valid `SKILL.md`.
 Supporting references, scripts, assets, and agent-specific metadata live inside
 the same directory.
+
+Repository-only material is never installed:
+
+- `evals/` holds agent behavior evaluations for the skills. See
+  [evals/README.md](./evals/README.md).
+- `tests/` holds script tests, for example `tests/spec-lint/run.sh` and
+  `tests/consistency/run.sh`.
+- `scripts/check-skill-consistency.py` checks that rules shared between skills
+  stay identical.
 
 The skills.sh CLI handles GitHub downloads, skill discovery, agent-specific
 installation paths, source tracking, and updates. This repository does not

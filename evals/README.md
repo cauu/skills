@@ -27,7 +27,7 @@ The command exits 0 only when every assertion passes. A missing login, a missing
 
 ## Cost
 
-About 0.18 USD and 30 seconds per case run with `claude-opus-5-5` (measured 2026-11-03).
+About 30 seconds per case run. Claude Code reports about 0.18 USD per case with `claude-opus-5-5` (measured 2026-11-03). That figure is a list-price equivalent (`costBasis: list`). Runs use the local Claude login, so they draw on the subscription's usage rather than an API bill.
 
 ## Evidence boundary
 
