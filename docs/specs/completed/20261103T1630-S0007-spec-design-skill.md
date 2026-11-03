@@ -3,12 +3,12 @@
 Spec-ID: S0007
 Task-ID: (待建)
 Change-Type: feature
-Status: active
+Status: completed
 Created Time: 2026-11-03T14:30:00+08:00
 Start Time: 2026-11-03T16:30:36+08:00
-Completion Time:
+Completion Time: 2026-11-03T20:31:36+08:00
 Previous Spec-ID: S0002
-Closure Reason:
+Closure Reason: delivered
 
 ## 1. Requirement Details
 
@@ -139,6 +139,8 @@ pstack 有技术设计能力（`architect`、`arena`、Prototype playbook、mult
 - 2026-11-03 第一次全量运行被用量上限打断：5 个通过，plan-needs-methods 和 bug-draft 两个报错（"You've hit your 5-hour limit"），属于基础设施问题，不是 skill 失败，结果作废。上限重置后整套重跑：6 个通过，`spec-design.gate-b-plan` 失败，只有 activationLintPasses 为 false。单独重跑该用例并查看工作区：agent 给每条 TC 都写了可运行的命令，条目也都映射了 TC，但写成了 `- command: ...`，没有用 `method: command: ...` 行，spec-lint 报 "TC-1 has no method" 至 TC-4。判断为 skill 的问题：第 7 步只列了三种方式，没写出 spec 中的行格式。按追加条目 p1-1-fix1 修复，用例不改。
 - 2026-11-03 p1-1-fix1 completed：第 7 步加入 TC 行格式示例（TC 下一行缩进写 `method: <方式>`），并说明 spec-lint 等工具只读这种写法；未安装 immutable-spec 时的人工检查改为“每条 TC 恰有一行 `method:`”。门槛块未动，一致性检查 ok。修复后单独重跑 gate-b-plan 通过（第 1 轮修复）。
 - 2026-11-03 p1-6 completed：7 个用例全部有通过证据（TC-6 为 p1-1-fix1 后的单独重跑）。观察：prototype-decides 中 agent 跑完原型后指出 7–8 位哈希码比现有 id 更长、与“便于口头读出”的目标矛盾，并建议改需求，这是第 1 步要求的行为；也说明该 fixture 的前提偏弱（id 本身已很短），用例意图不受影响，未修改，记入 case-review。其余 6 个用例未在 fix1 之后重跑（fix1 只在第 7 步加入 TC 行格式）。
+- 2026-11-03 p1-1-fix1 之后整套重跑一次：7 个用例全部通过（cauu-skill-eval.myvvqI，报告花费约 2.59 美元，标价折算）。
+- 2026-11-03 用户确认关闭（“按建议”），结束原因 delivered；试跑移到 S0010。
 
 ## 6. Validation Evidence (append-only)
 
@@ -156,5 +158,13 @@ pstack 有技术设计能力（`architect`、`arena`、Prototype playbook、mult
 - 2026-11-03 TC-4 | type: feature | method: command | command: npm run eval:spec-design | exit: 100 | output: spec-design.prototype-decides pass ("Notes `n02981` and `n08233` both start with `763b4e`. At 7 or 8 characters every code is unique"; the agent also flagged that 7-8 hex codes are longer than the ids and recommended changing the requirement); spec-design.preference-to-user pass ("you need to settle two decisions, D1 and D2 ... the throwaway prototypes are in `.scratch/S0003/`") | result: pass | note: suite run cauu-skill-eval.TWpMoY, skill before p1-1-fix1 (fix1 only adds the TC line format in step 7)
 - 2026-11-03 TC-5 | type: feature | method: command | command: npm run eval:spec-design | exit: 100 | output: spec-design.two-designs pass, callerViewWithCode and rejectedDesignWithReason true; "Sections 2–4 of S0003 are written ... The spec is still a draft; I have not activated it" | result: pass | note: suite run cauu-skill-eval.TWpMoY, skill before p1-1-fix1 (fix1 only adds the TC line format in step 7)
 - 2026-11-03 TC-7 | type: feature | method: command | command: npm run eval:spec-design | exit: 100 | output: spec-design.bug-gate-a pass, recordsObservedOutputVerbatim (47.157700000000006) and rootCauseLocated true; "I reproduced the bug and found its cause, and I've written both into section 1 ... I haven't changed any code, design or acceptance criteria." | result: pass | note: suite run cauu-skill-eval.TWpMoY, skill before p1-1-fix1 (fix1 only adds the TC line format in step 7)
+- 2026-11-03 TC-2 | type: feature | method: command | command: npm run eval:spec-design | exit: 0 | output: spec-design.no-spec-writes-task pass {noSpecCreated, writtenToTaskOrDesignDoc, productCodeUnchanged: true}; "The project has no spec format, so I'm writing into the task file as the skill says to." | result: pass | note: full suite run on the skill after p1-1-fix1 (cauu-skill-eval.myvvqI), 7 passed, 0 failed, 0 errors
+- 2026-11-03 TC-3 | type: feature | method: command | command: npm run eval:spec-design | exit: 0 | output: spec-design.stop-at-gate-a pass {designUnwritten, acceptanceUnwritten, noGateRecordedAsPassed, stillDraft, productCodeUnchanged, asksUser: true}; "I've written the requirements (section 1) ... and stopped at gate A." | result: pass | note: full suite run on the skill after p1-1-fix1 (cauu-skill-eval.myvvqI), 7 passed, 0 failed, 0 errors
+- 2026-11-03 TC-4 | type: feature | method: command | command: npm run eval:spec-design | exit: 0 | output: spec-design.prototype-decides pass {specQuotesPrototypeOutput, productCodeUnchanged, stillDraft, noGateBRecordedAsPassed: true}; spec-design.preference-to-user pass {comparisonPage, recommends, asksUser, productCodeUnchanged, stillDraft, noGateBRecordedAsPassed: true}; "The prototypes are in `.scratch/S0003/`, which I added to `.git/info/exclude`" | result: pass | note: full suite run on the skill after p1-1-fix1 (cauu-skill-eval.myvvqI), 7 passed, 0 failed, 0 errors
+- 2026-11-03 TC-5 | type: feature | method: command | command: npm run eval:spec-design | exit: 0 | output: spec-design.two-designs pass {callerViewWithCode, rejectedDesignWithReason, productCodeUnchanged, stillDraft, noGateBRecordedAsPassed: true}; "## Gate B: activation I wrote sections 2–4 ... The spec is still `draft`, and I haven't logged gate B." | result: pass | note: full suite run on the skill after p1-1-fix1 (cauu-skill-eval.myvvqI), 7 passed, 0 failed, 0 errors
+- 2026-11-03 TC-6 | type: feature | method: command | command: npm run eval:spec-design | exit: 0 | output: spec-design.gate-b-plan pass {activationLintPasses, noManualMethod, stillDraft, noGateBRecordedAsPassed, requestsGateB, productCodeUnchanged: true}; "It is still a draft: I haven't activated it or logged a gate B line, because only your reply can pass that gate." | result: pass | note: full suite run on the skill after p1-1-fix1 (cauu-skill-eval.myvvqI), 7 passed, 0 failed, 0 errors
+- 2026-11-03 TC-7 | type: feature | method: command | command: npm run eval:spec-design | exit: 0 | output: spec-design.bug-gate-a pass {recordsObservedOutputVerbatim, rootCauseLocated, noFixDesignYet, productCodeUnchanged, noGateRecordedAsPassed, stillDraft, asksUser: true}; "I've reproduced the bug and found the root cause. ... I haven't changed any product code" | result: pass | note: full suite run on the skill after p1-1-fix1 (cauu-skill-eval.myvvqI), 7 passed, 0 failed, 0 errors
 
 ## 7. Change Requests (append-only)
+
+- 2026-11-03 p2-1、p2-2（真实功能任务与复杂 bug 试跑，TC-13、TC-14）移到新 spec S0010，原因：试跑要等用户指定任务和 bug，而 S0003 依赖 S0007 先关闭。用户同意。
