@@ -1,0 +1,27 @@
+description: code-review behavior cases
+providers: file://../lib/claude-provider.yaml
+extensions:
+- file://../lib/hooks.cjs:extensionHook
+prompts:
+- '{{task}}'
+tests:
+- description: synthesize reproduces a P1 and records attempts for one it cannot reproduce
+  vars:
+    fixture: synthesize-repro
+    task: Use the code-review skill at .claude/skills/code-review/SKILL.md. The three reviewer reports for feature notes-export are already in code_review/notes-export/. Run synthesize.
+  options:
+    repeat: 1
+  metadata:
+    caseId: code-review.reproduce-p1
+    repeat: 1
+    minPassRate: 1.0
+    behavior: during re-confirmation the orchestrator tries to reproduce each P0/P1; a reproduced one is labeled 证据支持（已复现） with its command, and one it cannot reproduce keeps its verdict and lists the paths tried
+    regressionRisk: high-severity findings are reported on code reading alone, or an environment-specific defect is dropped or falsely claimed as reproduced
+    knownOmissions:
+    - automatic routing (the skill disables model invocation; the task names it)
+    - the review command, its capability probe, and the three-reviewer fan-out (no network or external reviewers in the sandbox)
+    - preferring the project's verify-<app> skill (the fixture has none)
+    - P0 findings and P1 findings that do not hold after reading
+  assert:
+  - type: javascript
+    value: file://assert/reproduce-p1.cjs

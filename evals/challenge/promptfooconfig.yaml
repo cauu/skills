@@ -1,0 +1,45 @@
+description: challenge behavior cases
+providers: file://../lib/claude-provider.yaml
+extensions:
+- file://../lib/hooks.cjs:extensionHook
+prompts:
+- '{{task}}'
+tests:
+- description: an acceptance criterion the agent cannot check is flagged
+  vars:
+    fixture: criteria-review
+    task: Use the challenge skill at .claude/skills/challenge/SKILL.md. Review the proposal in docs/proposal.md before we build it.
+  options:
+    repeat: 1
+  metadata:
+    caseId: challenge.unverifiable-criteria
+    repeat: 1
+    minPassRate: 1.0
+    behavior: every acceptance criterion is checked for whether the agent can verify it; one with no runnable check and no reason is named and a runnable check or a reason is asked for
+    regressionRisk: a spec is activated with a criterion nobody can check, and acceptance falls back to the user's impression
+    knownOmissions:
+    - automatic routing to challenge (the task names the skill)
+    - criteria that carry a valid reason for human-only judgment
+    - whether the proposed runnable rewrite is a good one
+  assert:
+  - type: javascript
+    value: file://assert/unverifiable-criteria.cjs
+- description: a question that running code can answer gets a prototype, not a debate
+  vars:
+    fixture: perf-question
+    task: Use the challenge skill at .claude/skills/challenge/SKILL.md. Review the proposal in docs/proposal.md before we build it.
+  options:
+    repeat: 1
+  metadata:
+    caseId: challenge.prototype-open-question
+    repeat: 1
+    minPassRate: 1.0
+    behavior: when the proposal's key claim can be settled by running something, the review runs it or recommends the smallest prototype or measurement, instead of arguing on paper
+    regressionRisk: a costly migration is approved or rejected on an untested performance guess
+    knownOmissions:
+    - automatic routing to challenge (the task names the skill)
+    - behavior, timing, and layout questions other than performance
+    - whether a measurement the agent reports is accurate
+  assert:
+  - type: javascript
+    value: file://assert/prototype-open-question.cjs

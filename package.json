@@ -6,7 +6,10 @@
     "node": ">=22.22.0"
   },
   "scripts": {
-    "eval:immutable-spec": "evals/run.sh immutable-spec"
+    "eval:immutable-spec": "evals/run.sh immutable-spec",
+    "eval:challenge": "evals/run.sh challenge",
+    "eval:tdd": "evals/run.sh tdd",
+    "eval:code-review": "evals/run.sh code-review"
   },
   "devDependencies": {
     "promptfoo": "0.122.0"

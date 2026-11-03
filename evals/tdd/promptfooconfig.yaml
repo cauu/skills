@@ -1,0 +1,27 @@
+description: tdd behavior cases
+providers: file://../lib/claude-provider.yaml
+extensions:
+- file://../lib/hooks.cjs:extensionHook
+prompts:
+- '{{task}}'
+tests:
+- description: a bug fix lands its failing test before the fix
+  vars:
+    fixture: slug-bug
+    task: "Use the tdd skill at .claude/skills/tdd/SKILL.md. Bug report: slugify('Hello   World') (three spaces) returns 'hello---world', but it should return 'hello-world'. Please fix it. The seam is the exported slugify() in src/slug.js; that is agreed, no need to ask me. Commit your work when you are done."
+  options:
+    repeat: 1
+  metadata:
+    caseId: tdd.bug-test-before-fix
+    repeat: 1
+    minPassRate: 1.0
+    behavior: for a bug, the agent reproduces it first with a failing test at the reported entry point, and that failing test is committed before the fix
+    regressionRisk: a fix ships without proof that the bug existed, or with a test that would have passed before the fix
+    knownOmissions:
+    - automatic routing to tdd (the task names the skill)
+    - a bug the agent cannot reproduce (it should stop and report)
+    - seam confirmation (the task pre-confirms the seam)
+    - whether the failing test fails for the reported reason rather than another one
+  assert:
+  - type: javascript
+    value: file://assert/test-before-fix.cjs
