@@ -19,6 +19,8 @@ ITEM = re.compile(r"^- \[( |~|x)\] (p[\w.-]+)\b(.*)$")
 EVIDENCE = re.compile(r"\bTC-(\d+)\s*\|(.*)$")
 MANUAL = re.compile(r"^manual\s*\(reason:\s*(.*?)\)\s*$")
 MAPPING_LINE = re.compile(r"\bmapping:\s*(p[\w.-]+)\s*→\s*(.+)$")
+# Split evidence fields only where the next token is "<key>:", so commands may contain pipes.
+FIELD_SPLIT = re.compile(r"\s*\|\s*(?=[a-z][\w-]*:\s)")
 NOT_NEEDED = re.compile(r"verify-update: not needed\. Reason: \S")
 SKIP_DIRS = {".git", "node_modules"}
 
@@ -119,7 +121,7 @@ def parse_evidence(body):
             continue
         tc, rest = match.groups()
         fields = {}
-        for part in rest.split("|"):
+        for part in FIELD_SPLIT.split(rest):
             if ":" in part:
                 key, value = part.split(":", 1)
                 fields[key.strip()] = value.strip()

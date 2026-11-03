@@ -125,6 +125,7 @@ TC-<n> | type: <change-type> | method: <verify | command | manual> | command: <c
 - [~] p1-8 一致性检查脚本：主版本门槛表、orca 版引用、其他 skill 内联句子
 - [~] p1-9 用 case designer 设计 `evals/immutable-spec/` 中 TC-2 至 TC-6 的用例，**先经用户审核，再实际运行**
 - [ ] p1-10 更新 README 与工作流概览
+- [x] p1-6-fix1 spec-lint: allow pipes inside evidence commands → TC-1
 
 ## 4. Test and Acceptance Criteria
 
@@ -174,12 +175,17 @@ TC-<n> | type: <change-type> | method: <verify | command | manual> | command: <c
 - 2026-11-03 发现：仓库内其他 draft 和已完成的 S0008 都没有条目到 TC 的映射，`spec-lint` 会报错。属于预期：draft 在各自激活时补映射（激活检查会拦住）；S0008 已关闭，不回改。
 - 2026-11-03 p1-7、p1-8 实现完成：orca 版声明依赖 `immutable-spec` 并引用其验收规则；一致性检查脚本 `scripts/check-skill-consistency.py` 和变更测试 `tests/consistency/run.sh`。等主版本规则一起提交，避免中间提交出现 orca 引用了尚不存在的章节。
 - 2026-11-03 p1-9 用例设计完成：新增 6 个用例，见 `evals/immutable-spec/case-review.md`。不调用 agent 的检查已完成（fixture lint、12 个模拟结果的断言判定、泄漏检查）。等待用户审核，审核通过后再实际运行。
+- 2026-11-03 p1-9 用例审核：用户批准 6 个新用例；批准 `reject-activation-without-method` 中“agent 自行补方法后激活”判为错误。决定人：用户。
+- 2026-11-03 用户批准 p1-1 至 p1-5 合并为一次提交（同一文件）。
+
+- 2026-11-03 p1-6-fix1：编写场景 spec 时发现 `spec-lint` 按每个 `|` 拆分证据字段，命令里含管道时会被截断。改为只在下一个词是 `<key>:` 时拆分，并新增 fixture `piped-command`。
 
 ## 6. Validation Evidence (append-only)
 
 - 2026-11-03 TC-1 | type: feature | method: command | command: tests/spec-lint/run.sh | exit: 0 | output: 17 fixtures ok, "spec-lint fixtures: 0 failure(s)"; covers missing method, manual without reason, bad result, missing output excerpt, [x] with inconclusive or no evidence, unmapped item, unknown TC, close stage with and without verify skill, appended mappings, legacy, valid | result: pass | note: run after the appended-mapping change
 - 2026-11-03 TC-7 | type: feature | method: command | command: scripts/check-skill-consistency.py && tests/consistency/run.sh | exit: 0 | output: "ok: 4 gates in immutable-spec, 7 skills checked"; mutations: inlined gate drift, base gate change, missing gate, renamed referenced section all exit 1; "consistency mutations: 0 failure(s)" | result: pass | note: no skill inlines a gate yet, so the test adds a stand-in skill in a disposable copy
 - 2026-11-03 TC-8 | type: feature | method: command | command: spec-lint --stage activate skills/engineering/immutable-spec/references/lite-spec-template.md | exit: 0 | output: "lite-spec-template.md: ok"; template has Reproduction record, Root cause, Fix, Verification (TC-1 fail before / pass after) | result: pass | note: -
+- 2026-11-03 TC-1 | type: feature | method: command | command: tests/spec-lint/run.sh | exit: 0 | output: 18 fixtures ok including piped-command, "spec-lint fixtures: 0 failure(s)" | result: pass | note: after the pipe fix
 
 ## 7. Change Requests (append-only)
 
