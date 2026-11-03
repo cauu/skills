@@ -138,7 +138,7 @@ spec 中引用功能的写法：`method: verify:<feature-id>/<sub-feature>`。
 
 p1 交付 skill 文本，用静态检查（TC-1、TC-8）验收；skill 的行为由 p1-7 的 eval 用例（TC-9 至 TC-12）和 p2 的试点（TC-2 至 TC-7）验收。全部通过之前本 spec 不关闭。
 
-- [ ] p1-1 调研 Claude Code、Codex、Cursor 项目级 skill 的发现路径，确定产物根目录（D1），把决策追加到 Execution Log → TC-8
+- [x] p1-1 调研 Claude Code、Codex、Cursor 项目级 skill 的发现路径，确定产物根目录（D1），把决策追加到 Execution Log → TC-8
 - [ ] p1-2 编写 `references/drive-contract.md` → TC-1
 - [ ] p1-3 编写 SKILL.md 的 create → TC-1
 - [ ] p1-4 编写 SKILL.md 的 maintain（局部和全量） → TC-1
@@ -193,6 +193,18 @@ TC-2 至 TC-7 在试点项目上运行，试点项目由用户在 p2 开始前�
 - 2026-11-03 gate B passed: user approved activating and delivering S0001 ("按照这个顺序继续推进"). Decided by: user.
 - 2026-11-03 激活。Task-ID 暂缺：Task-ID 规则在 S0009，本 spec 按现行 Spec-ID 规则执行。
 
+- 2026-11-03 p1-1 started。
+- 2026-11-03 p1-1 调研结果（各 harness 的项目级 skill 目录）：
+  - Claude Code（code.claude.com/docs/en/skills）：项目级 `.claude/skills/<skill-name>/SKILL.md`，从启动目录向上找到仓库根（worktree 中到 worktree 根）；子目录里的 `.claude/skills/` 在读写该子目录文件后才加载。文档没有提到 `.agents/skills/`。
+  - Codex（learn.chatgpt.com/docs/build-skills，原 developers.openai.com/codex/skills 308 跳转）：扫描从当前目录到仓库根每一级的 `.agents/skills`。文档没有把 `.codex/skills` 列为 skill 目录。
+  - Cursor（cursor.com/docs/context/skills）：项目级 `.agents/skills/` 和 `.cursor/skills/`；“For compatibility, Cursor also loads skills from Claude and Codex directories: `.claude/skills/`, `.codex/skills/`”。
+  - skills.sh CLI 1.7.6（`/tmp/s0001-skillscli/node_modules/skills/dist/cli.mjs`）：`AGENT_PROJECT_SKILL_DIRS` 共 30 个目录，含 `.agents/skills`、`.claude/skills`、`.codex/skills`；安装目标 `claude-code` 为 `.claude/skills`，`codex` 与 `cursor` 都是 `.agents/skills`。
+  - 结论：没有一个目录能同时被 Claude Code 和 Codex 发现；`.claude/skills/` 加 `.agents/skills/` 两处覆盖三个 harness。
+- 2026-11-03 D1 决策：采用方案 B。主体放在 `docs/verification/<app>/`（`README.md` 写 Launch / Doctor / Drive / Evidence / Cleanup / Helpers / Isolation，另有 `drive-contract.md`、`features/`、`scripts/`）；在 `.claude/skills/verify-<app>/SKILL.md` 和 `.agents/skills/verify-<app>/SKILL.md` 各放一个只含 frontmatter 和指向主体的薄包装，项目确定只用其中一种 harness 时只写对应的那个。理由：（1）主体与 harness 无关，满足“不绑定 harness”，也和 `docs/specs/` 的做法一致，人能直接读；（2）两个包装覆盖 Claude Code、Codex、Cursor，内容只有指针，不会出现两份主体漂移；（3）包装就是根目录 agent skill 目录下的 `verify-*` 目录，`spec-lint` 的收尾检测照常生效（TC-8）；（4）maintain 的修改范围清楚：`docs/verification/<app>/` 加两个包装。代价：agent 多读一个文件；Cursor 会看到两个同名包装，内容相同，不影响使用。没有选方案 A（主体放在某个 harness 目录、另一个放符号链接或副本）：符号链接在 Windows 和部分 harness 上不可靠，副本会漂移。决定人：agent，用户可推翻。
+- 2026-11-03 p1-1 completed：新增 `tests/verification/layout.sh`，验证 D1 布局被 `spec-lint` 识别。
+
 ## 6. Validation Evidence (append-only)
+
+- 2026-11-03 TC-8 | type: feature | method: command | command: tests/verification/layout.sh | exit: 0 | output: "ok claude-wrapper-only: update required (exit 1)", "ok agents-wrapper-only: update required (exit 1)", "ok both-wrappers: update required (exit 1)", "ok body-without-wrapper: ok (exit 0)", "verification layout: 0 failure(s)" | result: pass | note: runs the real spec-lint --stage close against temporary repos laid out per D1
 
 ## 7. Change Requests (append-only)
