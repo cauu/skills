@@ -143,7 +143,7 @@ p1 交付 skill 文本，用静态检查（TC-1、TC-8）验收；skill 的行�
 - [x] p1-3 编写 SKILL.md 的 create → TC-1
 - [x] p1-4 编写 SKILL.md 的 maintain（局部和全量） → TC-1
 - [x] p1-5 编写 `references/feature-map-example/`（含 `Source entry points`） → TC-1
-- [ ] p1-6 补充 `agents/openai.yaml`，更新 README（工作流概览由用户维护，本 spec 不修改） → TC-1
+- [x] p1-6 补充 `agents/openai.yaml`，更新 README（工作流概览由用户维护，本 spec 不修改） → TC-1
 - [ ] p1-7 用 case designer 设计 `evals/verification/` 用例，先不调用 agent 验证用例本身，经用户审核后再实际运行 → TC-9, TC-10, TC-11, TC-12
 - [ ] p2-1 试点 A：在一个 Web 或 CLI 项目上运行 create（项目待定） → TC-2, TC-3, TC-4
 - [ ] p2-2 试点 B：在一个 Aiken 项目上运行 create，与 `aiken-debug` 对照（项目待定） → TC-5
@@ -218,6 +218,10 @@ TC-2 至 TC-7 在试点项目上运行，试点项目由用户在 p2 开始前�
 
 - 2026-11-03 p1-4 completed：SKILL.md 新增 `maintain`：共用规则（定位工具、修改范围、三类问题的分诊和区分“有意改动”与“回归”的依据、驱动的三条不变式、结论 `clean`/`changed`/`blocked`），`maintain --scope` 五步（按 `Source entry points` 匹配 diff、识别新入口、只驱动受影响和新增的功能），`maintain` 全量五步。`structure.sh skill` 增加章节和三个结论词的检查。
 
+- 2026-11-03 p1-6 started。
+
+- 2026-11-03 p1-6 completed：`agents/openai.yaml`（不允许隐式调用，与 code-review 一致）；README 在 User-invoked 下加入 verification 条目、目录树和 `tests/verification/`。`docs/ai-engineering-workflow-overview.md` 按用户要求未修改（该文件也未纳入版本控制）。仓库已有检查不受影响：`scripts/check-skill-consistency.py` 输出 "ok: 4 gates in immutable-spec, 8 skills checked"，`tests/spec-lint/run.sh` 输出 "spec-lint fixtures: 0 failure(s)"。
+
 ## 6. Validation Evidence (append-only)
 
 - 2026-11-03 TC-8 | type: feature | method: command | command: tests/verification/layout.sh | exit: 0 | output: "ok claude-wrapper-only: update required (exit 1)", "ok agents-wrapper-only: update required (exit 1)", "ok both-wrappers: update required (exit 1)", "ok body-without-wrapper: ok (exit 0)", "verification layout: 0 failure(s)" | result: pass | note: runs the real spec-lint --stage close against temporary repos laid out per D1
@@ -225,5 +229,6 @@ TC-2 至 TC-7 在试点项目上运行，试点项目由用户在 p2 开始前�
 - 2026-11-03 TC-1 | type: feature | method: command | command: tests/verification/structure.sh feature-map | exit: 0 | output: "ok five H2s in order" for create-note.md and export.md, "ok indexed" for both, "ok 2 feature files", "verification structure (feature-map): 0 failure(s)"; mutation (Source entry points -> Source files) gives "FAIL H2s in .../export.md" | result: pass | note: feature-map part only (p1-5)
 - 2026-11-03 TC-1 | type: feature | method: command | command: tests/verification/structure.sh skill | exit: 0 | output: "ok name: verification", "ok description present", "ok link SKILL.md -> references/drive-contract.md", "ok link SKILL.md -> references/feature-map-example/README.md", "ok SKILL.md requires no other skill", "ok no placeholders", "verification structure (skill): 0 failure(s)"; mutation (appended "Requires the immutable-spec skill" and a link to references/missing.md) gives 2 failures | result: pass | note: skill part only (p1-3, create section)
 - 2026-11-03 TC-1 | type: feature | method: command | command: tests/verification/structure.sh skill | exit: 0 | output: "ok section: ## create", "ok section: ## maintain", "ok section: ### maintain --scope <diff>", "ok section: ### maintain (full)", "ok maintain outcomes: clean changed blocked", "verification structure (skill): 0 failure(s)"; mutation (blocked -> stuck) gives "FAIL maintain outcomes are 'clean changed stuck'" | result: pass | note: skill part (p1-4); maintain behavior is accepted by TC-11, TC-12 and TC-6, TC-7
+- 2026-11-03 TC-1 | type: feature | method: command | command: tests/verification/structure.sh | exit: 0 | output: 36 ok lines across contract, feature-map, skill, meta, including "ok result words: pass fail inconclusive unreachable", "ok name: verification", "ok SKILL.md requires no other skill", "ok maintain outcomes: clean changed blocked", "ok openai.yaml has allow_implicit_invocation", "ok README lists verification"; "verification structure (contract feature-map skill meta): 0 failure(s)" | result: pass | note: full run (all parts) after p1-6
 
 ## 7. Change Requests (append-only)

@@ -70,6 +70,13 @@ workflow, see
   resolved code-change scope using three isolated reviewer executions, verify
   candidate findings against the code, and produce an advisory checklist for
   human confirmation.
+- **[verification](./skills/engineering/verification/SKILL.md)** — Generate
+  and maintain a project-local `verify-<app>` tool that launches the real app,
+  drives its features the way a user does, and keeps evidence. `create` proves
+  the tool by running it once; `maintain --scope <diff>` updates only the
+  features a change touched; `maintain` checks every feature. The tool is plain
+  files under `docs/verification/<app>/` with thin wrappers in `.claude/skills/`
+  and `.agents/skills/`, so it needs no skill installed to use.
 
 ### Model-invoked
 
@@ -106,7 +113,8 @@ skills/
     ├── codebase-map/
     ├── immutable-spec/
     ├── immutable-spec-orca/
-    └── tdd/
+    ├── tdd/
+    └── verification/
 ```
 
 Every distributable skill is a directory containing a valid `SKILL.md`.
@@ -117,8 +125,8 @@ Repository-only material is never installed:
 
 - `evals/` holds agent behavior evaluations for the skills. See
   [evals/README.md](./evals/README.md).
-- `tests/` holds script tests, for example `tests/spec-lint/run.sh` and
-  `tests/consistency/run.sh`.
+- `tests/` holds script tests, for example `tests/spec-lint/run.sh`,
+  `tests/consistency/run.sh`, and `tests/verification/`.
 - `scripts/check-skill-consistency.py` checks that rules shared between skills
   stay identical.
 
