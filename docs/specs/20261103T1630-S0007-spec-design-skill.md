@@ -81,7 +81,7 @@ pstack 有技术设计能力（`architect`、`arena`、Prototype playbook、mult
 - [x] p1-3 编写 `references/rationale-template.md`、`references/decision-brief.md` → TC-11
 - [x] p1-4 `immutable-spec-orca` 第 3 步改为指向本 skill（可选读取） → TC-9
 - [x] p1-5 补充 `agents/openai.yaml`，更新 README（工作流概览 `docs/ai-engineering-workflow-overview.md` 未纳入版本控制，本 spec 不改） → TC-12
-- [ ] p1-6 用 case designer 设计 `evals/spec-design/` 中 TC-2 至 TC-7 的用例，加入 `npm run eval:spec-design`，**先经用户审核，再实际运行** → TC-2, TC-3, TC-4, TC-5, TC-6, TC-7
+- [~] p1-6 用 case designer 设计 `evals/spec-design/` 中 TC-2 至 TC-7 的用例，加入 `npm run eval:spec-design`，**先经用户审核，再实际运行** → TC-2, TC-3, TC-4, TC-5, TC-6, TC-7
 - [ ] p2-1 用一个真实 feature Task 试运行，走到关口 B → TC-13
 - [ ] p2-2 用一个复杂 bug 试运行简化版 → TC-14
 
@@ -133,6 +133,7 @@ pstack 有技术设计能力（`architect`、`arena`、Prototype playbook、mult
 - 2026-11-03 p1-1 completed：`skills/engineering/spec-design/SKILL.md`，八步流程、两个关口的记录格式、原型规则（可运行问题由 agent 运行决定，偏好问题同页切换对比交给用户，scratch 默认 `.scratch/<id>/` 并写入 `.git/info/exclude`）、方案要求、challenge 可选（未安装时按其三条标准自审）、验证计划与内联的四个门槛块、小改动跳过条件、复杂 bug 简化版、“实现中反复别扭说明方案有误”的说明。frontmatter 设 `disable-model-invocation: true`（用户调用）。
 - 2026-11-03 p1-4 completed：`immutable-spec-orca` “Draft and Activation” 第 3 步保留原句，补充“安装了 `spec-design` 时按它执行到关口 B 提请；未安装时照本步直接做”。依赖声明（requires: immutable-spec）未变，orca 不依赖 spec-design。
 - 2026-11-03 p1-5 completed：`agents/openai.yaml`（`allow_implicit_invocation: false`，与 code-review 一致）；README 在 User-invoked 下新增 spec-design 条目，目录树加入 `spec-design/`。工作流概览未改（未纳入版本控制，按任务要求不动）。
+- 2026-11-03 p1-6 用例设计完成，未运行：7 个用例（TC-2 一个、TC-3 一个、TC-4 两个、TC-5 一个、TC-6 一个、TC-7 一个），fixtures、断言与 `case-review.md` 在 `evals/spec-design/`，`package.json` 新增 `eval:spec-design`。不调用 agent 的检查已完成：6 份 fixture spec 的 `spec-lint --stage activate` 均按预期失败（都是设计中的 draft）；24 个模拟结果（7 个正确、17 个错误）全部判定正确；泄漏检查 36 个词，任务和 fixture 中只在 plan-needs-methods 已写好的方案里出现模板标题，该用例的断言不检查这些标题。p1-6 保持 [~]：等用户审核用例后再运行，TC-2 至 TC-7 尚无证据。本次提交只保存用例源码供审核，不表示条目完成。
 
 ## 6. Validation Evidence (append-only)
 
