@@ -79,7 +79,7 @@ Both forms share these rules:
 - **Drive** per the tool's Launch model and its drive contract. Whatever fails, keep three invariants: run Doctor before the first drive and after any failed drive; evidence survives every cleanup, checked at its location; nothing a drive started outlives the run. If Doctor fails because the tool is out of date, fix it and retry once before calling the pass `blocked`.
 - **Outcome**, exactly one:
   - `clean`: everything driven matched. No edits, no commit.
-  - `changed`: proven corrections to the tool. Re-read every changed file, set `Last full run:` to this run, and commit once.
+  - `changed`: proven corrections to the tool. Re-read every changed file and commit once. Only a full pass sets `Last full run:` to this run; a scoped pass leaves it, because the next full pass checks changes since that line.
   - `blocked`: the pass could not finish, or a fix could not be proven. Say what blocked it.
 
   Report the outcome, each feature driven with its result, and every product regression.

@@ -144,11 +144,12 @@ p1 交付 skill 文本，用静态检查（TC-1、TC-8）验收；skill 的行�
 - [x] p1-4 编写 SKILL.md 的 maintain（局部和全量） → TC-1
 - [x] p1-5 编写 `references/feature-map-example/`（含 `Source entry points`） → TC-1
 - [x] p1-6 补充 `agents/openai.yaml`，更新 README（工作流概览由用户维护，本 spec 不修改） → TC-1
-- [ ] p1-7 用 case designer 设计 `evals/verification/` 用例，先不调用 agent 验证用例本身，经用户审核后再实际运行 → TC-9, TC-10, TC-11, TC-12
+- [~] p1-7 用 case designer 设计 `evals/verification/` 用例，先不调用 agent 验证用例本身，经用户审核后再实际运行 → TC-9, TC-10, TC-11, TC-12
 - [ ] p2-1 试点 A：在一个 Web 或 CLI 项目上运行 create（项目待定） → TC-2, TC-3, TC-4
 - [ ] p2-2 试点 B：在一个 Aiken 项目上运行 create，与 `aiken-debug` 对照（项目待定） → TC-5
 - [ ] p2-3 局部更新试点：在试点 A 上做一次新增功能的改动，运行 `maintain --scope` → TC-6
 - [ ] p2-4 全量检查试点：在试点 A 上人为制造漂移和一个产品回归，运行 `maintain` → TC-7
+- [x] p1-4-fix1 maintain：只有全量检查更新 `Last full run:`，局部更新不动它 → TC-1, TC-12
 
 ## 4. Test and Acceptance Criteria
 
@@ -222,6 +223,19 @@ TC-2 至 TC-7 在试点项目上运行，试点项目由用户在 p2 开始前�
 
 - 2026-11-03 p1-6 completed：`agents/openai.yaml`（不允许隐式调用，与 code-review 一致）；README 在 User-invoked 下加入 verification 条目、目录树和 `tests/verification/`。`docs/ai-engineering-workflow-overview.md` 按用户要求未修改（该文件也未纳入版本控制）。仓库已有检查不受影响：`scripts/check-skill-consistency.py` 输出 "ok: 4 gates in immutable-spec, 8 skills checked"，`tests/spec-lint/run.sh` 输出 "spec-lint fixtures: 0 failure(s)"。
 
+- 2026-11-03 p1-7 started：按 case designer 设计 4 个用例（TC-9 至 TC-12），新增 `npm run eval:verification`。
+
+- 2026-11-03 p1-7 用例设计完成：4 个用例 `verification.create-proves-before-handover`（TC-9）、`verification.create-unrunnable-stays-draft`（TC-10）、`verification.maintain-reports-regression`（TC-11）、`verification.maintain-scope-only-mapped`（TC-12），见 `evals/verification/case-review.md`；新增 `npm run eval:verification`。不调用 agent 的检查已完成：4 个 fixture 应用在临时副本中按预期运行或失败；`tests/verification/eval-simulations.cjs` 用 suite 自己的 hook 建工作区并运行真实断言，18 个模拟结果全部判定正确（4 个正确结果通过，14 个错误结果被拒绝）；泄漏检查无命中（仅 fixture 中工具自带的 drive-contract 副本含 “drift” 一词）；`promptfoo validate config` 输出 "Configuration is valid."。等待用户审核，审核通过后再实际运行。
+- 2026-11-03 p1-7 暂缓提交：按例外第 2 条（条目已部分实现，TC-9 至 TC-12 尚无运行证据），用例、fixtures、断言、`package.json` 脚本和模拟脚本留在工作区未提交，等用户审核用例后与运行证据一起提交。
+
+- 2026-11-03 p1-7 用例审核：用户批准 verification 的全部用例、case-review 中列出的判断、D1 方案 B 和 Last full run 标记；试点 A 定为 utxray，试点 B 定为 bubble-cardano-validators。决定人：用户。
+
+- 2026-11-03 第一次全量运行（cauu-skill-eval.sIFfyp）：create-proves-before-handover、create-unrunnable-stays-draft、maintain-scope-only-mapped 通过；maintain-reports-regression 失败，只有 driftFixed 为 false，agent 输出称已把 list.md 改为 `list`。判断为用例过窄：负向检查在整个文件里找 `notes ls`，修正后的文件在 Gotchas 等处提到旧名字也会被判失败，比已批准的意图（清单的驱动步骤用 `list` 而不是 `ls`）更窄。修正第 1 轮：driftFixed 只检查 “Driving it with” 一节，决定性要求不变；新增两个模拟（Gotchas 提到旧名字应通过；入口改了但驱动步骤仍是 `ls` 应失败），20 个模拟全部判对。记录在 case-review.md 的 Changed after approval。当时的工作区已被后续用例覆盖，无法确认 list.md 的原文，原因是推断。
+- 2026-11-03 单独重跑 maintain-reports-regression（cauu-skill-eval.5t639W）：driftFixed 等文件检查全部通过（list.md 驱动步骤为 `list`，提交 84ca5df 只改工具文件并写明 export 回归），但 outcomeChanged 为 false：agent 启动了 3 个后台只读子 agent 并调用 ScheduleWakeup 等待，provider 在第 9 轮（45 秒）以 terminalReason completed 返回了中间消息作为最终输出，最终报告没有被捕获。判断为输出捕获的基础设施问题，不是 skill 或用例错误；按要求不采用这次的部分输出，改动 skill 后整套重跑。
+- 2026-11-03 p1-4-fix1 started：第一次运行中 maintain-scope 的 agent 指出 SKILL.md 要求 `changed` 时一律把 `Last full run:` 设为本次运行，但局部更新不是全量检查，挪动这一行会让下一次全量检查漏看变化。agent 的判断正确，skill 有误。修改为只有全量检查更新这一行。
+
+- 2026-11-03 p1-4-fix1 completed：SKILL.md 的 `changed` 结论改为 “Only a full pass sets `Last full run:` to this run; a scoped pass leaves it”。第三次整套运行（cauu-skill-eval.6AYJhG，基于修正后的 skill）中 maintain-scope 的工作区 `Last full run:` 保持 20261101T100000Z-notes，提交 b5dd1aa 只改 features/README.md 和 features/search.md。
+
 ## 6. Validation Evidence (append-only)
 
 - 2026-11-03 TC-8 | type: feature | method: command | command: tests/verification/layout.sh | exit: 0 | output: "ok claude-wrapper-only: update required (exit 1)", "ok agents-wrapper-only: update required (exit 1)", "ok both-wrappers: update required (exit 1)", "ok body-without-wrapper: ok (exit 0)", "verification layout: 0 failure(s)" | result: pass | note: runs the real spec-lint --stage close against temporary repos laid out per D1
@@ -230,5 +244,7 @@ TC-2 至 TC-7 在试点项目上运行，试点项目由用户在 p2 开始前�
 - 2026-11-03 TC-1 | type: feature | method: command | command: tests/verification/structure.sh skill | exit: 0 | output: "ok name: verification", "ok description present", "ok link SKILL.md -> references/drive-contract.md", "ok link SKILL.md -> references/feature-map-example/README.md", "ok SKILL.md requires no other skill", "ok no placeholders", "verification structure (skill): 0 failure(s)"; mutation (appended "Requires the immutable-spec skill" and a link to references/missing.md) gives 2 failures | result: pass | note: skill part only (p1-3, create section)
 - 2026-11-03 TC-1 | type: feature | method: command | command: tests/verification/structure.sh skill | exit: 0 | output: "ok section: ## create", "ok section: ## maintain", "ok section: ### maintain --scope <diff>", "ok section: ### maintain (full)", "ok maintain outcomes: clean changed blocked", "verification structure (skill): 0 failure(s)"; mutation (blocked -> stuck) gives "FAIL maintain outcomes are 'clean changed stuck'" | result: pass | note: skill part (p1-4); maintain behavior is accepted by TC-11, TC-12 and TC-6, TC-7
 - 2026-11-03 TC-1 | type: feature | method: command | command: tests/verification/structure.sh | exit: 0 | output: 36 ok lines across contract, feature-map, skill, meta, including "ok result words: pass fail inconclusive unreachable", "ok name: verification", "ok SKILL.md requires no other skill", "ok maintain outcomes: clean changed blocked", "ok openai.yaml has allow_implicit_invocation", "ok README lists verification"; "verification structure (contract feature-map skill meta): 0 failure(s)" | result: pass | note: full run (all parts) after p1-6
+- 2026-11-03 TC-1 | type: feature | method: command | command: tests/verification/structure.sh | exit: 0 | output: "ok maintain outcomes: clean changed blocked", "verification structure (contract feature-map skill meta): 0 failure(s)" | result: pass | note: after p1-4-fix1
+- 2026-11-03 TC-12 | type: feature | method: command | command: npm run eval:verification | exit: 0 | output: verification.maintain-scope-only-mapped pass; checks {newFeatureMapped, newFeatureIndexed, newFeatureDriven, unaffectedNotDriven, unaffectedNotEdited, productUnchanged, oneCommit} all true; "Evidence is in .verify-artifacts/20261103T110120Z-workspace/search/"; workspace keeps "Last full run: 20261101T100000Z-notes" | result: pass | note: suite run cauu-skill-eval.6AYJhG (4 passed), after p1-4-fix1
 
 ## 7. Change Requests (append-only)
