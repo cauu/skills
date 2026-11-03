@@ -213,7 +213,7 @@ Completion rules:
   - `replaced`
   - `cancelled`
 - Before closing, run `scripts/spec-lint --stage close <spec>` and fix every error.
-- Verification tool update: when the project has a `verify-<app>` skill and the spec changed user-visible behavior, the last Execution Plan item must update it (for example `verification maintain --scope <this spec's diff>`), and it must be `[x]` before closure. When the spec changed no user-visible behavior, append `- <date> verify-update: not needed. Reason: <reason>.` to the Execution Log instead. Skip this rule when the project has no `verify-<app>` skill.
+- Verification tool update: when the project has a `verify-<app>` skill (a `verify-*` skill directory under `.claude/skills/`, `.agents/skills/`, or another agent skill directory at the project root) and the spec changed user-visible behavior, the last Execution Plan item must update it (for example `verification maintain --scope <this spec's diff>`), and it must be `[x]` before closure. When the spec changed no user-visible behavior, append `- <date> verify-update: not needed. Reason: <reason>.` to the Execution Log instead. Skip this rule when the project has no `verify-<app>` skill.
 
 ## Delivery Workflow
 

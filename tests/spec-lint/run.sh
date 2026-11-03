@@ -12,6 +12,7 @@ for dir in "$here"/cases/*/; do
   args="$(cat "$dir/args")"
   args="${args//REPO_WITH_VERIFY/$here/repo-with-verify}"
   args="${args//REPO_WITHOUT_VERIFY/$here/repo-without-verify}"
+  args="${args//REPO_WITH_NESTED_VERIFY/$here/repo-with-nested-verify}"
   expect="$(cat "$dir/expect")"
   # shellcheck disable=SC2086
   output="$("$lint" $args "$dir/spec.md" 2>&1)"; status=$?

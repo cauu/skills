@@ -7,6 +7,7 @@ Exit 0 when every spec passes, 1 when any rule fails, 2 on usage errors.
 Specs without a Change-Type header are legacy and are skipped.
 """
 import argparse
+import glob
 import os
 import re
 import sys
@@ -22,7 +23,6 @@ MAPPING_LINE = re.compile(r"\bmapping:\s*(p[\w.-]+)\s*→\s*(.+)$")
 # Split evidence fields only where the next token is "<key>:", so commands may contain pipes.
 FIELD_SPLIT = re.compile(r"\s*\|\s*(?=[a-z][\w-]*:\s)")
 NOT_NEEDED = re.compile(r"verify-update: not needed\. Reason: \S")
-SKIP_DIRS = {".git", "node_modules"}
 
 
 def sections(lines):
@@ -136,9 +136,10 @@ def parse_evidence(body):
 
 
 def repo_has_verify_skill(root):
-    for directory, subdirs, files in os.walk(root):
-        subdirs[:] = [d for d in subdirs if d not in SKIP_DIRS]
-        if os.path.basename(directory).startswith("verify-") and "SKILL.md" in files:
+    """True when the project root has a verify-<app> skill in an agent skill directory,
+    such as .claude/skills/verify-app/SKILL.md. Nested copies (fixtures, vendored code) do not count."""
+    for skills_dir in glob.glob(os.path.join(root, ".*", "skills")):
+        if glob.glob(os.path.join(skills_dir, "verify-*", "SKILL.md")):
             return True
     return False
 

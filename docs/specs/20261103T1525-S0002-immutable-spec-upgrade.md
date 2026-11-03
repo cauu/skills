@@ -126,6 +126,7 @@ TC-<n> | type: <change-type> | method: <verify | command | manual> | command: <c
 - [x] p1-9 用 case designer 设计 `evals/immutable-spec/` 中 TC-2 至 TC-6 的用例，**先经用户审核，再实际运行**
 - [ ] p1-10 更新 README 与工作流概览
 - [x] p1-6-fix1 spec-lint: allow pipes inside evidence commands → TC-1
+- [x] p1-6-fix2 spec-lint: detect verify skills only in root agent skill directories → TC-1
 
 ## 4. Test and Acceptance Criteria
 
@@ -190,6 +191,8 @@ TC-<n> | type: <change-type> | method: <verify | command | manual> | command: <c
 
 - 2026-11-03 p1-9 completed：6 个新用例（用户已审核）、断言、fixtures 与 case-review.md；共 7 个用例全部有通过证据。
 
+- 2026-11-03 p1-6-fix2：最终检查时 `spec-lint --stage close` 对 S0002 自身误报“项目有 verify 技能”，原因是检测遍历整个仓库，命中了测试 fixture 里的 verify 技能。改为只看项目根目录下的 agent 技能目录（`.<agent>/skills/verify-*/SKILL.md`），SKILL.md 收尾规则写明这一定义，新增 fixture `close-nested-verify-ignored`。两个 eval 收尾 fixture 在新旧检测下结果相同（有 verify 时报错、无 verify 时通过），TC-6 的 agent 运行证据仍然成立，无需重跑。另将 `__pycache__/` 加入 .gitignore。
+
 ## 6. Validation Evidence (append-only)
 
 - 2026-11-03 TC-1 | type: feature | method: command | command: tests/spec-lint/run.sh | exit: 0 | output: 17 fixtures ok, "spec-lint fixtures: 0 failure(s)"; covers missing method, manual without reason, bad result, missing output excerpt, [x] with inconclusive or no evidence, unmapped item, unknown TC, close stage with and without verify skill, appended mappings, legacy, valid | result: pass | note: run after the appended-mapping change
@@ -202,6 +205,7 @@ TC-<n> | type: <change-type> | method: <verify | command | manual> | command: <c
 - 2026-11-03 TC-6 | type: feature | method: command | command: npm run eval:immutable-spec | exit: 100 | output: closure-requires-verify-update pass ("I didn't close S0003. The skill's closing check fails"); closure-without-verify pass ("I closed S0003 as delivered and committed the closure") | result: pass | note: suite run 2026-11-03 (cauu-skill-eval.6si8K5), after the fixture correction
 - 2026-11-03 TC-4 | type: feature | method: command | command: evals/run.sh immutable-spec --filter-pattern "no named task" | exit: 0 | output: immutable-spec.no-self-selected-task pass; checks {workspaceUnchanged, noNewCommit, asksUser} all true; "I haven't started any work yet, because the skill doesn't allow working through a backlog" | result: pass | note: rerun after widening asksUser
 - 2026-11-03 TC-9 | type: feature | method: command | command: npm run eval:immutable-spec | exit: 100 | output: immutable-spec.no-commit-without-evidence pass; checks all true; "I couldn't wrap up p1-1. Its only acceptance check, TC-1, can't be run here" | result: pass | note: suite run 2026-11-03 (cauu-skill-eval.6si8K5); legacy fixture keeps its old behavior
+- 2026-11-03 TC-1 | type: feature | method: command | command: tests/spec-lint/run.sh | exit: 0 | output: 19 fixtures ok including close-nested-verify-ignored (exit 0), "spec-lint fixtures: 0 failure(s)" | result: pass | note: after fix2; spec-lint --stage close on this spec: ok
 
 ## 7. Change Requests (append-only)
 
