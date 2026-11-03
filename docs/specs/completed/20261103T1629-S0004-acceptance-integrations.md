@@ -3,12 +3,12 @@
 Spec-ID: S0004
 Task-ID: (待建)
 Change-Type: feature
-Status: active
+Status: completed
 Created Time: 2026-11-03T13:55:00+08:00
 Start Time: 2026-11-03T16:29:53+08:00
-Completion Time:
+Completion Time: 2026-11-03T20:17:11+08:00
 Previous Spec-ID: S0002
-Closure Reason:
+Closure Reason: delivered
 
 ## 1. Requirement Details
 
@@ -104,6 +104,8 @@ S0002 定义了通过标准和自主验收规则。`challenge`、`tdd`、`code-r
 - 2026-11-03 p1-4 用例审核：用户批准 challenge、tdd、code-review 的全部用例及 case-review 中列出的判断。决定人：用户。
 - 2026-11-03 第一次运行 `npm run eval:challenge`（cauu-skill-eval.yGuCBF）：`challenge.unverifiable-criteria` 失败，仅 `runnableCriteriaNotFlagged` 为 false。阅读完整输出后判定用例有误：agent 给标准 1、2 写了 `agent:` 命令，把标准 3 标为 `unverifiable:` 并给出改写；但 Recommendation 段落是一行，先提到数据 `milk, eggs`，再说 "criterion 3 can't be tested"，按行检查误判。检查改为按句子判断并跳过提到 criterion 3 的句子，决定性含义不变（称 header 或 `milk, eggs` 标准不可验证的句子仍被拒绝，模拟结果复核仍判失败），记录于 `evals/challenge/case-review.md` 的 Changed after approval。单独重跑该用例通过。skill 未改。
 - 2026-11-03 p1-4 completed：4 个新用例全部有通过证据（修正 1 轮，在用例侧）；回归套件 7/7 通过。
+
+- 2026-11-03 用户确认关闭（“按建议”），结束原因 delivered。
 
 ## 6. Validation Evidence (append-only)
 
