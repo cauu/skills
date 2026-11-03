@@ -58,7 +58,7 @@ S0002 规定了每个 spec 的通过标准和自主验收规则。标准说明�
 2. 同时记录动作和动作后的状态。副作用（写入的文件、插入的记录、发出的消息）要单独确认。
 3. dry-run 或测试模式实际跳过了什么，要观察确认，不能按名字推断。
 4. mock 只用在生产环境本来就隔离的外部边界上。
-5. 证据目录：`.verify-artifacts/<run-id>/<feature-id>/`，加入 gitignore，清理时不删除。
+5. 证据目录：`.verify-artifacts/<run-id>/<feature-id>/`，加入 gitignore，清理时不删除。写入 spec 的证据行必须摘录关键输出（S0002），目录中的截图和日志只作补充。
 6. 实例隔离：多个 worktree 并行时，用 run-id 派生端口、数据目录和用户配置。做不到时，在产物中明确声明一次只能运行一个实例。
 7. 控制脚本要求：命令少而可组合；有破坏性的操作支持 `--dry-run`；输出 JSON；错误信息说明该怎么做；`--help` 完整。
 8. 结论用词与 S0002 一致：`pass`、`fail`、`inconclusive`、`unreachable`。
@@ -171,6 +171,7 @@ spec 中引用功能的写法：`method: verify:<feature-id>/<sub-feature>`。
 
 - 2026-11-03 草稿创建。
 - 2026-11-03 草稿曾被删除，随后恢复并缩小范围：证据门槛和结论用词移到 S0002；新增三个触发时机和 `maintain --scope`。依赖 S0002。
+- 2026-11-03 草稿修订（按挑战结论）：证据行必须摘录关键输出，证据目录只作补充。
 
 ## 6. Validation Evidence (append-only)
 

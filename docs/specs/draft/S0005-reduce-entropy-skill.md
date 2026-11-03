@@ -25,7 +25,7 @@ Closure Reason:
 
 ### Constraints
 
-- 独立安装。证据门槛引用 `immutable-spec` 中 refactor 一行（S0002）。
+- 独立安装。在 SKILL.md 中内联 refactor 门槛一句：改前固定行为，改后证明行为不变，类型检查和 lint 不算。由 S0002 的一致性检查确认与 `immutable-spec` 门槛表一致。
 - 不改变行为。发现 bug 时拆出去，走 bug-fix。
 
 ### Non-goals
@@ -58,6 +58,7 @@ SKILL.md 分“扫描”和“处理”两段，输出熵源清单、每项处�
 ## 5. Execution Log (append-only)
 
 - 2026-11-03 草稿创建。
+- 2026-11-03 草稿修订（按挑战结论）：refactor 门槛改为内联。
 
 ## 6. Validation Evidence (append-only)
 

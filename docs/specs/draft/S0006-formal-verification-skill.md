@@ -38,7 +38,7 @@ Closure Reason:
 
 ## 2. Outline Design
 
-产物为项目内的检查和说明。`Change-Type: formal` 的 spec 在验证计划中引用它的运行命令。
+产物为项目内的检查和说明。形式化检查是一种验证方式，不是改动类型：任何 spec 的 TC 都可以用 `command:` 引用它的运行命令（S0002）。
 
 ## References
 
@@ -63,6 +63,7 @@ Closure Reason:
 ## 5. Execution Log (append-only)
 
 - 2026-11-03 草稿创建。依赖 S0002。
+- 2026-11-03 草稿修订（按挑战结论）：不再使用 `Change-Type: formal`，改为由 TC 引用形式化检查的命令。
 
 ## 6. Validation Evidence (append-only)
 

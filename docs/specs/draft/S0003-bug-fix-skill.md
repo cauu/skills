@@ -20,7 +20,7 @@ Closure Reason:
 
 新增可分发 skill `skills/engineering/bug-fix/`，模型可自动调用。流程：
 
-1. 前提：Task 已由用户指定并认领。bug-fix 只检查这一前提，不实现认领流程（认领规则在 `immutable-spec`，见 S0002）。
+1. 前提：Task 已由用户指定并认领。bug-fix 只检查这一前提，不实现认领流程（认领规则在 `immutable-spec`，见 S0009）。
 2. 只读复现。项目里有 `verify-<app>` 时优先用它，其次用测试、脚本或直接操作真实应用。记录复现命令和输出。
 3. 无法复现：说明原因、尝试过的路径和缺少的条件，然后停止。不因为用户提出就强行修复。后续去向由用户决定。
 4. 已复现：判定复杂度，把结果和依据写入 Task。满足任意一条即为复杂：
@@ -49,7 +49,7 @@ Closure Reason:
 ## 2. Outline Design
 
 - SKILL.md 约 60 行以内，复杂度判定条件和证据要求写成清单。
-- 证据门槛引用 `immutable-spec` 中 bugfix 一行（S0002）。
+- 在 SKILL.md 中内联 bugfix 门槛一句：同一入口上先失败、后通过，复现命令和输出原样记录。由 S0002 的一致性检查确认与 `immutable-spec` 门槛表一致。
 
 ## References
 
@@ -75,6 +75,7 @@ Closure Reason:
 
 - 2026-11-03 草稿创建。依赖 S0002、S0007。
 - 2026-11-03 草稿修订：认领改为前提条件；补充未安装 immutable-spec 时的处理；复杂 bug 走 spec-design 简化版。
+- 2026-11-03 草稿修订（按挑战结论）：bugfix 门槛改为内联；认领规则改指 S0009。
 
 ## 6. Validation Evidence (append-only)
 

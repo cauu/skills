@@ -51,7 +51,7 @@ pstack 有技术设计能力（`architect`、`arena`、Prototype playbook、mult
 
 ### Constraints
 
-- 独立安装。`immutable-spec`、`challenge`、`codebase-design` 都是可选输入。没有 spec 时，产出写入 Task 或一个设计文档。
+- 独立安装。`immutable-spec`、`challenge`、`codebase-design` 都是可选输入。证据门槛表在 SKILL.md 中内联一份，由 S0002 的一致性检查确认与 `immutable-spec` 一致，所以未安装 `immutable-spec` 时也能起草验证计划。没有 spec 时，产出写入 Task 或一个设计文档。
 - 不修改产品代码。原型在 scratch 目录。
 - draft 内容可以修改；关口的决定按 S0002 的格式追加到 Execution Log。
 
@@ -99,6 +99,7 @@ pstack 有技术设计能力（`architect`、`arena`、Prototype playbook、mult
 ## 5. Execution Log (append-only)
 
 - 2026-11-03 草稿创建。依赖 S0002（证据门槛、关口记录格式）。
+- 2026-11-03 草稿修订（按挑战结论）：证据门槛表改为内联，并纳入一致性检查。
 
 ## 6. Validation Evidence (append-only)
 
