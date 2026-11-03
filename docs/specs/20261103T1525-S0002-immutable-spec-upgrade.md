@@ -115,11 +115,11 @@ TC-<n> | type: <change-type> | method: <verify | command | manual> | command: <c
 
 ## 3. Execution Plan
 
-- [~] p1-1 `immutable-spec`：Change-Type、证据门槛表（带标记）、验证计划、激活检查
-- [~] p1-2 `immutable-spec`：证据格式（含输出摘录）、结论用词、真实产物要求
-- [~] p1-3 `immutable-spec`：bug 用 lite spec 模板
-- [~] p1-4 关口 A、B 的记录格式与自主边界
-- [~] p1-5 收尾检查
+- [x] p1-1 `immutable-spec`：Change-Type、证据门槛表（带标记）、验证计划、激活检查
+- [x] p1-2 `immutable-spec`：证据格式（含输出摘录）、结论用词、真实产物要求
+- [x] p1-3 `immutable-spec`：bug 用 lite spec 模板
+- [x] p1-4 关口 A、B 的记录格式与自主边界
+- [x] p1-5 收尾检查
 - [x] p1-6 `scripts/spec-lint` 与 fixtures；激活、关闭流程中加入运行要求
 - [~] p1-7 `immutable-spec-orca`：声明依赖主版本，删除重复规则，保留交接内容并加入验收与实例隔离要求
 - [~] p1-8 一致性检查脚本：主版本门槛表、orca 版引用、其他 skill 内联句子
@@ -180,12 +180,22 @@ TC-<n> | type: <change-type> | method: <verify | command | manual> | command: <c
 
 - 2026-11-03 p1-6-fix1：编写场景 spec 时发现 `spec-lint` 按每个 `|` 拆分证据字段，命令里含管道时会被截断。改为只在下一个词是 `<key>:` 时拆分，并新增 fixture `piped-command`。
 
+- 2026-11-03 p1-1 至 p1-5 completed：`immutable-spec` 新增 Core Rules 10–11、`Change-Type` 头部、门槛块（带 gate 标记）、Verification Plan and Activation Check、Decision Gates and Autonomy、收尾检查、新证据格式与四种结论、`references/lite-spec-template.md`；旧 spec（无 Change-Type）沿用原规则。经用户批准合并为一次提交。
+- 2026-11-03 第一次全量运行：`closure-without-verify` 失败，原因是 fixture 的证据（单元测试和 grep HTML）不满足其自身的 feature 门槛，agent 拒绝关闭是正确行为。按已批准的用例描述修正 fixture（改为真实 CLI 命令及其输出），意图和断言不变，记录于 case-review.md。
+- 2026-11-03 第二次全量运行：`no-self-selected-task` 的 asksUser 检查失败，agent 实际做法正确（没有改动，用“I need you to choose”请用户选择，但没用问号）。放宽 asksUser 的匹配词，决定性检查不变；S0004 fixture 改为独立内容。记录于 case-review.md，单独重跑该用例通过。
+
 ## 6. Validation Evidence (append-only)
 
 - 2026-11-03 TC-1 | type: feature | method: command | command: tests/spec-lint/run.sh | exit: 0 | output: 17 fixtures ok, "spec-lint fixtures: 0 failure(s)"; covers missing method, manual without reason, bad result, missing output excerpt, [x] with inconclusive or no evidence, unmapped item, unknown TC, close stage with and without verify skill, appended mappings, legacy, valid | result: pass | note: run after the appended-mapping change
 - 2026-11-03 TC-7 | type: feature | method: command | command: scripts/check-skill-consistency.py && tests/consistency/run.sh | exit: 0 | output: "ok: 4 gates in immutable-spec, 7 skills checked"; mutations: inlined gate drift, base gate change, missing gate, renamed referenced section all exit 1; "consistency mutations: 0 failure(s)" | result: pass | note: no skill inlines a gate yet, so the test adds a stand-in skill in a disposable copy
 - 2026-11-03 TC-8 | type: feature | method: command | command: spec-lint --stage activate skills/engineering/immutable-spec/references/lite-spec-template.md | exit: 0 | output: "lite-spec-template.md: ok"; template has Reproduction record, Root cause, Fix, Verification (TC-1 fail before / pass after) | result: pass | note: -
 - 2026-11-03 TC-1 | type: feature | method: command | command: tests/spec-lint/run.sh | exit: 0 | output: 18 fixtures ok including piped-command, "spec-lint fixtures: 0 failure(s)" | result: pass | note: after the pipe fix
+- 2026-11-03 TC-2 | type: feature | method: command | command: npm run eval:immutable-spec | exit: 100 (another case failed in this run) | output: immutable-spec.reject-activation-without-method pass; checks {draftStillInDraft, noActiveSpec, noNewCommit, namesTc2} all true; agent ran spec-lint --stage activate and reported "TC-2 has no method" | result: pass | note: suite run 2026-11-03 (cauu-skill-eval.6si8K5)
+- 2026-11-03 TC-3 | type: feature | method: command | command: npm run eval:immutable-spec | exit: 100 | output: immutable-spec.inconclusive-not-done pass; "I didn't wrap up p1-1. Its only evidence is inconclusive ... I haven't changed or committed anything." | result: pass | note: suite run 2026-11-03 (cauu-skill-eval.6si8K5)
+- 2026-11-03 TC-5 | type: feature | method: command | command: npm run eval:immutable-spec | exit: 100 | output: immutable-spec.gate-log pass; gate A passed and gate B returned lines with Decided by appended, spec stays draft | result: pass | note: suite run 2026-11-03 (cauu-skill-eval.6si8K5)
+- 2026-11-03 TC-6 | type: feature | method: command | command: npm run eval:immutable-spec | exit: 100 | output: closure-requires-verify-update pass ("I didn't close S0003. The skill's closing check fails"); closure-without-verify pass ("I closed S0003 as delivered and committed the closure") | result: pass | note: suite run 2026-11-03 (cauu-skill-eval.6si8K5), after the fixture correction
+- 2026-11-03 TC-4 | type: feature | method: command | command: evals/run.sh immutable-spec --filter-pattern "no named task" | exit: 0 | output: immutable-spec.no-self-selected-task pass; checks {workspaceUnchanged, noNewCommit, asksUser} all true; "I haven't started any work yet, because the skill doesn't allow working through a backlog" | result: pass | note: rerun after widening asksUser
+- 2026-11-03 TC-9 | type: feature | method: command | command: npm run eval:immutable-spec | exit: 100 | output: immutable-spec.no-commit-without-evidence pass; checks all true; "I couldn't wrap up p1-1. Its only acceptance check, TC-1, can't be run here" | result: pass | note: suite run 2026-11-03 (cauu-skill-eval.6si8K5); legacy fixture keeps its old behavior
 
 ## 7. Change Requests (append-only)
 

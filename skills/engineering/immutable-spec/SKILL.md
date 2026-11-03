@@ -16,6 +16,10 @@ description: Execute software delivery with append-only specification documents 
 7. Do not close or complete the active spec until the user explicitly confirms that the spec is finished, replaced, or cancelled.
 8. Allow `draft` specs to be edited freely before execution starts.
 9. Once a spec becomes `active`, treat it as append-only.
+10. Before activation, declare a `Change-Type` and give every `TC-*` a verification method the agent can run, or a stated reason why it cannot.
+11. Accept work only with evidence from the real artifact, recorded with an output excerpt. Run `scripts/spec-lint` before activation and before closure.
+
+Specs without a `Change-Type` header predate rules 10 and 11. Keep following the rules they were written under; `spec-lint` skips them.
 
 ## Spec Location and Naming
 
@@ -83,6 +87,7 @@ Use one spec file per request. Include all of these sections in that file:
 
 Spec-ID: S0007
 Status: draft | active | completed
+Change-Type: feature | optimization | bugfix | refactor
 Created Time:
 Start Time:
 Completion Time:
@@ -104,13 +109,15 @@ Closure Reason:
 - <other spec-local references as needed>
 
 ## 3. Execution Plan
-- [ ] pX-1 <deliverable>
-- [ ] pX-2 <deliverable>
+- [ ] pX-1 <deliverable> → TC-1, TC-2
+- [ ] pX-2 <deliverable> → none (reason: <why no TC applies>)
 - ...
 
 ## 4. Test and Acceptance Criteria
-- TC-1 ...
-- TC-2 ...
+- TC-1 <observable result>
+  method: command: <command or steps the agent runs>
+- TC-2 <observable result>
+  method: manual (reason: <why the agent cannot run it>)
 - Pass/fail criteria
 
 ## 5. Execution Log (append-only)
@@ -118,7 +125,7 @@ Closure Reason:
 - <date> pX-1 completed ...
 
 ## 6. Validation Evidence (append-only)
-- <date> command/result summary mapped to TC-*
+- <date> TC-1 | type: <change-type> | method: command | command: <cmd> | exit: <code> | output: <key output lines> | result: pass | note: <observation>
 
 ## 7. Change Requests (append-only)
 - <date> requirement change / replacement / cancellation note
@@ -138,6 +145,64 @@ Reference rules:
 
 Do not allow more than one `active` spec at the same time.
 
+## Change Types and Evidence Gates
+
+`Change-Type` sets the minimum evidence that counts as a pass. Every TC of the spec must meet its gate.
+
+<!-- gate:feature -->
+- `feature`: every TC passes on the real artifact (the running app, command, or interface), not on unit tests alone. Collect after implementation.
+<!-- /gate -->
+<!-- gate:optimization -->
+- `optimization`: record a baseline before the change and the result after it, with the measurement method. Capture the baseline before changing code.
+<!-- /gate -->
+<!-- gate:bugfix -->
+- `bugfix`: the same entry point fails before the fix and passes after it, with the reproduction command and output recorded verbatim. Reproduce before fixing.
+<!-- /gate -->
+<!-- gate:refactor -->
+- `refactor`: pin current behavior before moving structure (characterization test, snapshot, or old-versus-new output comparison) and show it unchanged afterwards. Type checks and lint do not count. Pin before changing code.
+<!-- /gate -->
+
+For a performance measurement, also alternate several runs per side, report the median and range, and name what limits the number. This is guidance, not a gate.
+
+A formal check is a verification method, not a change type. Any TC may run one through `command:`.
+
+## Verification Plan and Activation Check
+
+Give every TC exactly one method:
+
+- `verify:<feature-id>/<sub-feature>`: drive a mapped feature of the project's `verify-<app>` skill, when one exists.
+- `command: <command or steps>`: a command or concrete steps the agent runs itself.
+- `manual (reason: <why>)`: only when the agent cannot run the check, with the reason.
+
+Prefer methods the agent can run. Do not activate a spec when:
+
+- a TC has no method;
+- a method cannot meet the spec's evidence gate;
+- a `manual` method has no reason.
+
+Run `scripts/spec-lint --stage activate <spec>` and fix every error before activation. List every `manual` TC to the user when asking to activate, so the user can accept it, ask for another method, or change the requirement.
+
+Map every Execution Plan item to its TCs with `→ TC-1, TC-2`, or `→ none (reason: ...)` when no TC applies. After activation the plan text is frozen, so change or add a mapping by appending `- <date> mapping: pX-N → TC-3` to Change Requests. The latest appended mapping wins.
+
+## Decision Gates and Autonomy
+
+Two user decisions are recorded in the spec, each as one appended Execution Log line:
+
+- Gate A, requirements confirmed: `- <date> gate A passed|returned: <conclusion>. Decided by: <user>.`
+- Gate B, activation approved: `- <date> gate B passed|returned: <conclusion>. Decided by: <user>.`
+
+Only work on a task the user named. Never pick work from a backlog yourself.
+
+The user decides:
+
+- where an unreproducible bug goes next;
+- gate A and gate B;
+- scope changes (append a Change Request and wait);
+- every TC whose result is `inconclusive`;
+- merging, closing a task, and other irreversible actions.
+
+Decide everything else yourself (change type, complexity, reproduction result, implementation detail) and record the reason in the spec, task, or PR so the user can overrule it.
+
 Completion rules:
 - A spec can remain `active` even when all currently known items are marked `[x]`.
 - Only change a spec from `active` to `completed` after the user explicitly says the spec is done.
@@ -147,17 +212,20 @@ Completion rules:
   - `delivered`
   - `replaced`
   - `cancelled`
+- Before closing, run `scripts/spec-lint --stage close <spec>` and fix every error.
+- Verification tool update: when the project has a `verify-<app>` skill and the spec changed user-visible behavior, the last Execution Plan item must update it (for example `verification maintain --scope <this spec's diff>`), and it must be `[x]` before closure. When the spec changed no user-visible behavior, append `- <date> verify-update: not needed. Reason: <reason>.` to the Execution Log instead. Skip this rule when the project has no `verify-<app>` skill.
 
 ## Delivery Workflow
 
 1. Read the active spec and extract pending item IDs (`pX-*`) plus mapped `TC-*`.
 2. Implement exactly one item at a time.
-3. Run the minimal test set that proves the mapped acceptance criteria.
-4. Append execution and validation evidence to the spec (do not edit prior entries).
+3. Run each mapped TC by its method, on the real artifact, and meet the spec's evidence gate.
+4. Append execution and validation evidence to the spec (do not edit prior entries). If a result is `inconclusive` or `unreachable`, stop that item and ask the user.
 5. Commit immediately for that item.
 6. Repeat until all plan items are complete.
 7. After all known items are complete, keep the spec open until the user explicitly closes it or declares it complete.
 8. When the user explicitly closes the active spec:
+   - run `scripts/spec-lint --stage close <spec>` and apply the verification tool update rule
    - update `Status` to `completed`
    - fill `Completion Time`
    - fill `Closure Reason`
@@ -173,8 +241,9 @@ Use only these states in `Execution Plan`:
 
 Transition rules:
 - Change `[ ]` to `[~]` when work on that item actually starts.
-- Change `[~]` to `[x]` only after implementation is complete, the mapped `TC-*` evidence is appended, and the item is ready to commit.
+- Change `[~]` to `[x]` only after implementation is complete, the latest evidence of every mapped `TC-*` is `pass`, and the item is ready to commit.
 - Do not mark `[x]` based on implementation alone.
+- Never mark `[x]` while a mapped TC is `fail`, `inconclusive`, or `unreachable`.
 - If a closed-looking spec receives a bug report before user sign-off, append a new item instead of reopening history by editing old log statements.
 
 ## Item ID Convention
@@ -247,7 +316,7 @@ Use this workflow when the user has manually authored code changes outside of Cl
    - Mark the mapped item `[x]` (or add a new `[x]` item if one was proposed).
    - Append an execution log entry with a `(manual)` tag, for example:
      `<date> <item-id> completed (manual): <short description of manual changes>`
-   - Add new `TC-*` entries to the acceptance criteria section if the manual changes introduce untested behavior.
+   - Add new `TC-*` entries, each with a method, to the acceptance criteria section if the manual changes introduce untested behavior.
 
 5. **Run validation** — execute build and test commands for the mapped `TC-*` entries. Append validation evidence using the standard format. If any validation fails, stop and report the failure to the user — do not commit.
 
@@ -267,17 +336,27 @@ Use this workflow when the user has manually authored code changes outside of Cl
 
 ## Validation Evidence
 
-Use one append-only evidence line per acceptance check. Keep the format stable:
+Use one append-only evidence line per acceptance check:
 
 ```text
-TC-<n> | stack: <rust|node|python|ansible|ui|other> | command: <cmd or manual step> | result: <pass|fail> | note: <short observation>
+- <date> TC-<n> | type: <change-type> | method: <verify|command|manual> | command: <cmd or steps> | exit: <code> | output: <key output lines> | files: <optional supporting paths> | result: <pass|fail|inconclusive|unreachable> | note: <observation>
 ```
 
+Rules:
+
+- Take evidence from the real artifact: the run result, the value actually read, the actual diff. A proxy, a self-report, or "it compiles" is not evidence.
+- Always excerpt the output that supports the result in `output:`. Screenshots and logs under `files:` only supplement it, because they may be ignored by Git or cleaned up. The spec line must stand on its own.
+- `result` is exactly one of:
+  - `pass`: the output meets the TC and the spec's evidence gate;
+  - `fail`: the check ran and the TC is not met;
+  - `inconclusive`: the check ran but the output does not decide the TC. It is not a pass. Ask the user;
+  - `unreachable`: the check could not run. Name the missing precondition and the paths tried.
+- A later line for the same TC supersedes an earlier one. Do not edit the earlier line.
+
 Examples:
-- `TC-1 | stack: rust | command: cargo test -q | result: pass | note: deploy payload defaults covered`
-- `TC-2 | stack: node | command: pnpm build | result: pass | note: deploy wizard renders with new defaults`
-- `TC-3 | stack: ansible | command: ansible-playbook --syntax-check ansible/playbooks/deploy.yml | result: pass | note: playbook syntax valid`
-- `TC-4 | stack: ui | command: manual validation of takeover banner | result: pass | note: probe warning shown for running node`
+- `- 2026-03-10 TC-1 | type: bugfix | method: command | command: node test/export.test.js | exit: 1 | output: AssertionError: expected 3 rows, got 2 | result: fail | note: reproduced before the fix`
+- `- 2026-03-10 TC-1 | type: bugfix | method: command | command: node test/export.test.js | exit: 0 | output: export ok (3 rows) | result: pass | note: same entry point after the fix`
+- `- 2026-03-10 TC-2 | type: feature | method: manual | command: open the print preview | exit: n/a | output: user confirmed two-column layout | result: pass | note: manual (reason: native print dialog)`
 
 Choose commands based on the project stack. Standardize the evidence format, not the toolchain.
 
@@ -296,6 +375,8 @@ Recommended item naming:
 - If the plan is already frozen and you need a clearly scoped repair item, use a suffix such as `p35-6-fix1`.
 
 Create a new spec only when the user changes scope, constraints, or requirements beyond the current spec boundary.
+
+For a complex bug that needs its own spec, start from [`references/lite-spec-template.md`](references/lite-spec-template.md). It keeps the spec file contract and adds the reproduction record, root cause, fix design, and verification standard.
 
 ## Handling Requirement Changes
 
