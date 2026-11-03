@@ -70,6 +70,12 @@ workflow, see
   resolved code-change scope using three isolated reviewer executions, verify
   candidate findings against the code, and produce an advisory checklist for
   human confirmation.
+- **[spec-design](./skills/engineering/spec-design/SKILL.md)** — Take a draft
+  spec or task from claim to activation: restate and clarify requirements,
+  settle open questions with throwaway prototypes or the user's choice, compare
+  at least two designs, and write acceptance criteria the agent can verify. The
+  agent drives; the user decides at gate A (requirements) and gate B
+  (activation). Works without other skills.
 
 ### Model-invoked
 
@@ -106,6 +112,7 @@ skills/
     ├── codebase-map/
     ├── immutable-spec/
     ├── immutable-spec-orca/
+    ├── spec-design/
     └── tdd/
 ```
 

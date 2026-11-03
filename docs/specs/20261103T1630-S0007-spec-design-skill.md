@@ -80,7 +80,7 @@ pstack 有技术设计能力（`architect`、`arena`、Prototype playbook、mult
 - [x] p1-2 编写 `references/design-red-flags.md`，与 `codebase-design` 对齐 → TC-10
 - [x] p1-3 编写 `references/rationale-template.md`、`references/decision-brief.md` → TC-11
 - [x] p1-4 `immutable-spec-orca` 第 3 步改为指向本 skill（可选读取） → TC-9
-- [ ] p1-5 补充 `agents/openai.yaml`，更新 README（工作流概览 `docs/ai-engineering-workflow-overview.md` 未纳入版本控制，本 spec 不改） → TC-12
+- [x] p1-5 补充 `agents/openai.yaml`，更新 README（工作流概览 `docs/ai-engineering-workflow-overview.md` 未纳入版本控制，本 spec 不改） → TC-12
 - [ ] p1-6 用 case designer 设计 `evals/spec-design/` 中 TC-2 至 TC-7 的用例，加入 `npm run eval:spec-design`，**先经用户审核，再实际运行** → TC-2, TC-3, TC-4, TC-5, TC-6, TC-7
 - [ ] p2-1 用一个真实 feature Task 试运行，走到关口 B → TC-13
 - [ ] p2-2 用一个复杂 bug 试运行简化版 → TC-14
@@ -132,6 +132,7 @@ pstack 有技术设计能力（`architect`、`arena`、Prototype playbook、mult
 - 2026-11-03 p1-3 completed：`references/rationale-template.md`（问题、调用方视角、结构、已决问题及原型证据、取舍、被否决的方案、待决问题；调用方视角先写），`references/decision-brief.md`（单个决定的格式：选项、推荐、依据、风险、需要用户做什么；关口 A、关口 B 的提请格式；bug 版关口 A 换成复现记录和根因）。
 - 2026-11-03 p1-1 completed：`skills/engineering/spec-design/SKILL.md`，八步流程、两个关口的记录格式、原型规则（可运行问题由 agent 运行决定，偏好问题同页切换对比交给用户，scratch 默认 `.scratch/<id>/` 并写入 `.git/info/exclude`）、方案要求、challenge 可选（未安装时按其三条标准自审）、验证计划与内联的四个门槛块、小改动跳过条件、复杂 bug 简化版、“实现中反复别扭说明方案有误”的说明。frontmatter 设 `disable-model-invocation: true`（用户调用）。
 - 2026-11-03 p1-4 completed：`immutable-spec-orca` “Draft and Activation” 第 3 步保留原句，补充“安装了 `spec-design` 时按它执行到关口 B 提请；未安装时照本步直接做”。依赖声明（requires: immutable-spec）未变，orca 不依赖 spec-design。
+- 2026-11-03 p1-5 completed：`agents/openai.yaml`（`allow_implicit_invocation: false`，与 code-review 一致）；README 在 User-invoked 下新增 spec-design 条目，目录树加入 `spec-design/`。工作流概览未改（未纳入版本控制，按任务要求不动）。
 
 ## 6. Validation Evidence (append-only)
 
@@ -140,5 +141,6 @@ pstack 有技术设计能力（`architect`、`arena`、Prototype playbook、mult
 - 2026-11-03 TC-1 | type: feature | method: command | command: tests/spec-design/run.sh structure | exit: 0 | output: "ok   structure", "spec-design checks: 0 failure(s)" | result: pass | note: name spec-design matches the directory; links to the three references resolve
 - 2026-11-03 TC-8 | type: feature | method: command | command: tests/spec-design/run.sh gates && scripts/check-skill-consistency.py && tests/consistency/run.sh | exit: 0 | output: "ok   gates"; "ok: 4 gates in immutable-spec, 8 skills checked"; "consistency mutations: 0 failure(s)" | result: pass | note: extra mutation on a copy (feature gate in spec-design changed) made check-skill-consistency.py exit 1 with "gate 'feature' differs from immutable-spec", so the real copy is covered
 - 2026-11-03 TC-9 | type: feature | method: command | command: tests/spec-design/run.sh orca && scripts/check-skill-consistency.py | exit: 0 | output: "ok   orca"; "ok: 4 gates in immutable-spec, 8 skills checked"; tests/consistency/run.sh also "consistency mutations: 0 failure(s)" | result: pass | note: before the edit the orca check failed with "step 3 does not point to spec-design"
+- 2026-11-03 TC-12 | type: feature | method: command | command: tests/spec-design/run.sh install | exit: 0 | output: "ok   install", "spec-design checks: 0 failure(s)" | result: pass | note: checks display_name, allow_implicit_invocation: false, README user-invoked entry and tree line
 
 ## 7. Change Requests (append-only)
