@@ -3,9 +3,9 @@
 Spec-ID: S0008
 Task-ID: (待建)
 Change-Type: feature
-Status: draft
+Status: active
 Created Time: 2026-11-03T16:00:00+08:00
-Start Time:
+Start Time: 2026-11-03T14:42:15+08:00
 Completion Time:
 Previous Spec-ID:
 Closure Reason:
@@ -112,6 +112,8 @@ provider 配置在 p1-1 中确认：
 ## 5. Execution Log (append-only)
 
 - 2026-11-03 草稿创建。被测 agent 使用 Claude（用户决定）。
+- 2026-11-03 关口 B 通过：用户批准激活并执行。决定人：用户。认证方式：本机 Claude 登录；用户接受运行成本。
+- 2026-11-03 激活。Task-ID 暂缺：Task-ID 标识规则尚未落地（S0002 范围），本 spec 按现行 Spec-ID 规则执行。
 
 ## 6. Validation Evidence (append-only)
 
