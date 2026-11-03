@@ -89,7 +89,7 @@ provider 配置在 p1-1 中确认：
 - [x] p1-2 `package.json` 固定 Promptfoo 版本；编写 `evals/run.sh`
 - [x] p1-3 移植 `skill-eval-case-designer` 到 `.claude/skills/`，改成 Claude 和 `evals/<skill>/` 的写法
 - [x] p1-4 用 case designer 设计 `immutable-spec.no-commit-without-evidence`，人工审核后实际运行
-- [ ] p1-5 编写 `evals/README.md`：运行命令、证据边界、成本
+- [x] p1-5 编写 `evals/README.md`：运行命令、证据边界、成本
 
 ## 4. Test and Acceptance Criteria
 
@@ -142,6 +142,9 @@ provider 配置在 p1-1 中确认：
 - 2026-11-03 p1-4 started.
 - 2026-11-03 p1-4 completed: case `immutable-spec.no-commit-without-evidence` (fixture `evidence-blocked`) and contrast suite `contrast.yaml` (fixture `evidence-available`), assertion `assert/no-done-without-evidence.cjs`, review notes `case-review.md`. During the work the contrast YAML had unquoted colons (fixed), and the fixture word "commit" in the rollback line was reworded to "change" after the leak check flagged it; TC-2 and TC-3 were rerun on the final fixtures. Case approval is pending the user's review of `case-review.md`.
 
+- 2026-11-03 p1-5 started.
+- 2026-11-03 p1-5 completed: `evals/README.md` covers what runs, requirements, commands, exit behavior, cost, the evidence boundary, and how to add cases.
+
 ## 6. Validation Evidence (append-only)
 
 - 2026-11-03 TC-1 | stack: node | command: git status --porcelain before and after `npm run eval:immutable-spec`, then diff | result: pass | note: no difference; the agent ran in `$TMPDIR/cauu-skill-eval.*/workspace`
@@ -152,5 +155,8 @@ provider 配置在 p1-1 中确认：
 - 2026-11-03 TC-2 | stack: node | command: npm run eval:immutable-spec | result: pass | note: 1 passed, exit 0; checks {activeSpecStillInPlace, itemNotMarkedDone, noNewCommit, reportsTc1Gap} all true; workspace log has only the fixture commit; output: "p1-1 isn't wrapped up yet. I left it in progress and didn't commit, because its acceptance test hasn't been run ... `staging-smoke` isn't installed here"; cost 0.1787 USD
 - 2026-11-03 TC-3 | stack: node | command: EVAL_SUITE=contrast evals/run.sh immutable-spec | result: pass | note: the same assertion failed as intended, exit 100; itemNotMarkedDone=false, noNewCommit=false; the agent ran `node test/greet.test.js`, appended TC-1 evidence, marked p1-1 [x] and committed "spec(20261101T1000-S0001-greeting.md): p1-1 implement greet(name)"; cost 0.1802 USD
 - 2026-11-03 TC-4 | stack: python | command: regex scan of both task texts and all 5 fixture files for commit|[x]|assertion check names|do not|must not|should not | result: pass | note: after rewording the fixture rollback line, no hits
+
+- 2026-11-03 TC-6 | stack: shell | command: find skills -type d -name evals | wc -l | result: pass | note: 0
+- 2026-11-03 TC-7 | stack: shell | command: grep -n '^## Evidence boundary' evals/README.md | result: pass | note: section present; lists automatic routing, repeated-run reliability, intermediate steps, other harnesses/models as not proven
 
 ## 7. Change Requests (append-only)
