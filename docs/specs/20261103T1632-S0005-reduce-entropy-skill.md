@@ -43,7 +43,7 @@ SKILL.md 分“扫描”和“处理”两段，输出熵源清单、每项处�
 
 ## 3. Execution Plan
 
-- [~] p1-1 编写 SKILL.md（内联 refactor 门槛） → TC-1, TC-2, TC-3, TC-4
+- [x] p1-1 编写 SKILL.md（内联 refactor 门槛） → TC-1, TC-2, TC-3, TC-4
 - [x] p1-2 补充 `agents/openai.yaml`，更新 README → none (reason: 元数据和文档，不改变 agent 行为)
 - [x] p1-3 用 case designer 设计 `evals/reduce-entropy/` 中 TC-1 至 TC-3 的用例，新增 `npm run eval:reduce-entropy`；**先经用户审核，再实际运行** → TC-1, TC-2, TC-3
 - [ ] p2-1 在一个真实项目上试运行一次（项目由用户之后指定） → TC-5, TC-6, TC-7
@@ -87,6 +87,7 @@ SKILL.md 分“扫描”和“处理”两段，输出熵源清单、每项处�
 - 2026-11-03 p1-3 用例审核：用户批准 reduce-entropy 的全部用例及 case-review 中列出的判断；接受 p1-1、p1-3 在进行中状态下提交。决定人：用户。
 - 2026-11-03 第一次全量运行（`npm run eval:reduce-entropy`，Node 24.12.0）：3 个用例全部通过，退出码 0，耗时 3 分 37 秒，Claude Code 报告标价折算约 0.89 USD（0.21 + 0.43 + 0.25）。没有用例失败，skill 和用例都未修改；没有触到 40 轮上限。
 - 2026-11-03 p1-3 completed：3 个用例（用户已审核）、断言、fixture 与 case-review.md；TC-1 至 TC-3 有通过证据。
+- 2026-11-03 p1-1 completed：TC-1 至 TC-3 由第一次全量运行通过，TC-4 已通过；SKILL.md 自 TC-4 证据以来未改动，复跑 `check-skill-consistency.py`（ok: 4 gates, 8 skills）、`tests/consistency/run.sh`（0 failure(s)）、副本门槛变异（exit 1）结果相同；`tests/spec-lint/run.sh` 0 failure(s)。不需要修复条目。
 
 ## 6. Validation Evidence (append-only)
 
