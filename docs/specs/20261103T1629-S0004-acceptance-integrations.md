@@ -55,7 +55,7 @@ S0002 定义了通过标准和自主验收规则。`challenge`、`tdd`、`code-r
 
 ## 3. Execution Plan
 
-- [ ] p1-1 `challenge`：原型优先、逐条检查验收标准能否由 agent 验证 → TC-5
+- [x] p1-1 `challenge`：原型优先、逐条检查验收标准能否由 agent 验证 → TC-5
 - [ ] p1-2 `tdd`：修 bug 先复现，失败用例先于修复 → TC-6
 - [ ] p1-3 `code-review`：P0/P1 尝试复现，标注 `证据支持（已复现）` 或列出尝试路径 → TC-7
 - [ ] p1-4 用 case designer 设计 `evals/challenge/`、`evals/tdd/`、`evals/code-review/` 的用例和 `package.json` 脚本，**先经用户审核，再实际运行** → TC-1, TC-2, TC-3, TC-4, TC-8
@@ -92,7 +92,11 @@ S0002 定义了通过标准和自主验收规则。`challenge`、`tdd`、`code-r
 - 2026-11-03 gate B passed: user approved activating and delivering S0004 ("按照这个顺序继续推进"). Decided by: user.
 - 2026-11-03 并行交付：本 spec 在独立 worktree 分支中激活和交付，与 S0007、S0001、S0005 并行；main 上只合入已关闭的 spec。用户同意。
 - 2026-11-03 激活。`spec-lint --stage activate` 通过，没有 manual TC。Task-ID 暂缺：Task-ID 规则在 S0009，本 spec 按现行 Spec-ID 规则执行。
+- 2026-11-03 p1-1 started.
+- 2026-11-03 p1-1 completed：`challenge/SKILL.md` 新增两段规则（Prototype what can be run；Check every acceptance criterion，可选使用项目的 `verify-<app>`），Required Output 新增 `## Acceptance Criteria Check`，Challenge 与 Missing Acceptance Criteria 的模板行补上“要运行什么”。行为验收在 p1-4（TC-1、TC-2）。
 
 ## 6. Validation Evidence (append-only)
+
+- 2026-11-03 TC-5 | type: feature | method: command | command: grep -nE "prototype|Acceptance Criteria Check" skills/engineering/challenge/SKILL.md; grep -n "](\.\./" skills/engineering/challenge/SKILL.md; scripts/check-skill-consistency.py | exit: 0 / 1 (no match) / 0 | output: "20:**Prototype what can be run.** When a question can be answered by running something (behavior, timing, layout, performance), do not settle it on paper."; "47:## Acceptance Criteria Check"; link grep printed nothing; "ok: 4 gates in immutable-spec, 7 skills checked" | result: pass | note: text layer only; agent behavior is TC-1 and TC-2
 
 ## 7. Change Requests (append-only)

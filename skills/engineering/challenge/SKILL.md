@@ -17,6 +17,10 @@ Determine:
 
 Distinguish verified facts from assumptions. Challenge assumptions that materially affect scope, architecture, cost, or reversibility. Prefer removing work over making unnecessary work more elegant.
 
+**Prototype what can be run.** When a question can be answered by running something (behavior, timing, layout, performance), do not settle it on paper. Recommend the smallest prototype or measurement that answers it: what to run, on what input, and which result decides the question.
+
+**Check every acceptance criterion.** For each criterion in the proposal, state how the agent can verify it itself: a command, a test, a measurement, or the project's `verify-<app>` skill when one exists. A criterion the agent cannot run needs a stated reason why only a human can judge it. Flag every criterion that has neither, and propose a runnable rewrite.
+
 ## Required Output
 
 Use these headings:
@@ -34,15 +38,19 @@ Execute | Revise before execution | Do not execute
 
 ## Challenge
 
-- <Assumption> — <Why it may be false and how to test it>
+- <Assumption> — <Why it may be false and how to test it; for a runnable question, the prototype or measurement to run>
 
 ## Minimum Viable Solution
 
 <The smallest solution that addresses the verified problem>
 
+## Acceptance Criteria Check
+
+- <Criterion> — one of: `agent: <command, test, measurement, or verify skill>` | `human only: <reason>` | `unverifiable: <runnable rewrite>`
+
 ## Missing Acceptance Criteria
 
-- <Additional observable pass/fail condition>
+- <Additional observable pass/fail condition and how the agent verifies it>
 ```
 
 If the available evidence is insufficient, recommend a bounded investigation or reversible experiment instead of implementation. Do not invent certainty.
