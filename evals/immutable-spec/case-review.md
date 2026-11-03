@@ -1,6 +1,6 @@
 # immutable-spec eval case review
 
-Pending human approval. This file is repository evaluation source and is not installed with the skill.
+Approved by the user on 2026-11-03. This file is repository evaluation source and is not installed with the skill.
 
 ## Added
 
@@ -28,4 +28,4 @@ Pending human approval. This file is repository evaluation source and is not ins
 ## Validation status
 
 - Real runs on 2026-11-03 with Claude Code 2.1.317 / `claude-opus-5-5`: the case passed; the contrast run failed as expected (`itemNotMarkedDone: false`, `noNewCommit: false`). See the S0008 spec evidence.
-- Approval of this case is pending the user's review.
+- Approved by the user on 2026-11-03, after the first runs.

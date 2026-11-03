@@ -145,6 +145,8 @@ provider 配置在 p1-1 中确认：
 - 2026-11-03 p1-5 started.
 - 2026-11-03 p1-5 completed: `evals/README.md` covers what runs, requirements, commands, exit behavior, cost, the evidence boundary, and how to add cases.
 
+- 2026-11-03 p1-4 用例审核：用户批准 `immutable-spec.no-commit-without-evidence` 及其对照测试，用例正式生效。决定人：用户。补齐了 p1-4 中“人工审核”这一步（审核晚于首次运行，原因见上文）。
+
 ## 6. Validation Evidence (append-only)
 
 - 2026-11-03 TC-1 | stack: node | command: git status --porcelain before and after `npm run eval:immutable-spec`, then diff | result: pass | note: no difference; the agent ran in `$TMPDIR/cauu-skill-eval.*/workspace`
