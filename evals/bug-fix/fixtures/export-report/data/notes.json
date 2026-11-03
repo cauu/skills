@@ -1,0 +1,7 @@
+[
+  { "id": "n1", "title": "Buy milk", "created": "2026-10-01" },
+  { "id": "n2", "title": "Call Ana, re: \"the trip\"", "created": "2026-10-02" },
+  { "id": "n3", "title": "Dentist", "created": "2026-10-05" },
+  { "id": "n4", "title": "Fix bike", "created": "2026-10-09" },
+  { "id": "n5", "title": "Read book", "created": "2026-10-12" }
+]

@@ -10,7 +10,8 @@
     "eval:challenge": "evals/run.sh challenge",
     "eval:tdd": "evals/run.sh tdd",
     "eval:code-review": "evals/run.sh code-review",
-    "eval:spec-design": "evals/run.sh spec-design"
+    "eval:spec-design": "evals/run.sh spec-design",
+    "eval:bug-fix": "evals/run.sh bug-fix"
   },
   "devDependencies": {
     "promptfoo": "0.122.0"
