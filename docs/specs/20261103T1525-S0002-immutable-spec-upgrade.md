@@ -124,7 +124,7 @@ TC-<n> | type: <change-type> | method: <verify | command | manual> | command: <c
 - [x] p1-7 `immutable-spec-orca`：声明依赖主版本，删除重复规则，保留交接内容并加入验收与实例隔离要求
 - [x] p1-8 一致性检查脚本：主版本门槛表、orca 版引用、其他 skill 内联句子
 - [x] p1-9 用 case designer 设计 `evals/immutable-spec/` 中 TC-2 至 TC-6 的用例，**先经用户审核，再实际运行**
-- [ ] p1-10 更新 README 与工作流概览
+- [x] p1-10 更新 README 与工作流概览
 - [x] p1-6-fix1 spec-lint: allow pipes inside evidence commands → TC-1
 - [x] p1-6-fix2 spec-lint: detect verify skills only in root agent skill directories → TC-1
 
@@ -193,6 +193,7 @@ TC-<n> | type: <change-type> | method: <verify | command | manual> | command: <c
 
 - 2026-11-03 p1-6-fix2：最终检查时 `spec-lint --stage close` 对 S0002 自身误报“项目有 verify 技能”，原因是检测遍历整个仓库，命中了测试 fixture 里的 verify 技能。改为只看项目根目录下的 agent 技能目录（`.<agent>/skills/verify-*/SKILL.md`），SKILL.md 收尾规则写明这一定义，新增 fixture `close-nested-verify-ignored`。两个 eval 收尾 fixture 在新旧检测下结果相同（有 verify 时报错、无 verify 时通过），TC-6 的 agent 运行证据仍然成立，无需重跑。另将 `__pycache__/` 加入 .gitignore。
 
+- 2026-11-03 p1-10 completed（补记：提交 3a07c09 时更新脚本因该条目未先标为 [~] 而中断，spec 记录漏写，在此补上）：README 更新 immutable-spec 条目、补充 immutable-spec-orca（注明依赖）、说明仓库专用的 evals/、tests/、scripts/；evals/README 的成本说明改为“标价折算，走订阅额度”。`docs/ai-engineering-workflow-overview.md` 未纳入版本控制，未修改，待用户决定。
 ## 6. Validation Evidence (append-only)
 
 - 2026-11-03 TC-1 | type: feature | method: command | command: tests/spec-lint/run.sh | exit: 0 | output: 17 fixtures ok, "spec-lint fixtures: 0 failure(s)"; covers missing method, manual without reason, bad result, missing output excerpt, [x] with inconclusive or no evidence, unmapped item, unknown TC, close stage with and without verify skill, appended mappings, legacy, valid | result: pass | note: run after the appended-mapping change
