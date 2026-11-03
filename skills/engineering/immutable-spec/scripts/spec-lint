@@ -1,0 +1,244 @@
+#!/usr/bin/env python3
+"""Check the machine-checkable rules of an immutable spec.
+
+Usage: spec-lint [--stage activate|close] [--repo DIR] SPEC [SPEC ...]
+
+Exit 0 when every spec passes, 1 when any rule fails, 2 on usage errors.
+Specs without a Change-Type header are legacy and are skipped.
+"""
+import argparse
+import os
+import re
+import sys
+
+CHANGE_TYPES = {"feature", "optimization", "bugfix", "refactor"}
+RESULTS = {"pass", "fail", "inconclusive", "unreachable"}
+SECTION = re.compile(r"^## (\d+)\.\s")
+TC_ENTRY = re.compile(r"^- TC-(\d+)\b")
+ITEM = re.compile(r"^- \[( |~|x)\] (p[\w.-]+)\b(.*)$")
+EVIDENCE = re.compile(r"\bTC-(\d+)\s*\|(.*)$")
+MANUAL = re.compile(r"^manual\s*\(reason:\s*(.*?)\)\s*$")
+MAPPING_LINE = re.compile(r"\bmapping:\s*(p[\w.-]+)\s*→\s*(.+)$")
+NOT_NEEDED = re.compile(r"verify-update: not needed\. Reason: \S")
+SKIP_DIRS = {".git", "node_modules"}
+
+
+def sections(lines):
+    found, current = {}, None
+    for number, line in enumerate(lines, 1):
+        match = SECTION.match(line)
+        if match:
+            current = match.group(1)
+            found[current] = []
+            continue
+        if line.startswith("## "):
+            current = None
+        if current:
+            found[current].append((number, line))
+    return found
+
+
+def header_value(lines, key):
+    for line in lines:
+        if line.startswith("## "):
+            return None
+        if line.startswith(key + ":"):
+            return line.split(":", 1)[1].strip()
+    return None
+
+
+def parse_tcs(body):
+    tcs, current = {}, None
+    for number, line in body:
+        entry = TC_ENTRY.match(line)
+        if entry:
+            current = entry.group(1)
+            tcs.setdefault(current, []).append({"line": number, "method": None})
+            inline = re.search(r"method:\s*(.+)$", line)
+            if inline:
+                tcs[current][-1]["method"] = inline.group(1).strip()
+            continue
+        if line.startswith("- "):
+            current = None
+            continue
+        if current:
+            method = re.match(r"^\s+method:\s*(.*)$", line)
+            if method and tcs[current][-1]["method"] is None:
+                tcs[current][-1]["method"] = method.group(1).strip()
+    return tcs
+
+
+def method_error(method):
+    if not method:
+        return "has no method"
+    if method.startswith("verify:"):
+        return None if re.match(r"^verify:\S+/\S+", method) else "verify method needs <feature-id>/<sub-feature>"
+    if method.startswith("command:"):
+        return None if method[len("command:"):].strip() else "command method is empty"
+    if method.startswith("manual"):
+        manual = MANUAL.match(method)
+        return None if manual and manual.group(1).strip() else "manual method has no reason"
+    return "method must be verify:, command:, or manual (reason: ...)"
+
+
+def parse_mapping(target):
+    target = target.strip()
+    if re.match(r"^none \(reason:\s*\S.*\)", target):
+        return []
+    ids = re.findall(r"TC-(\d+)", target)
+    return ids if ids else None
+
+
+def appended_mappings(*bodies):
+    found = {}
+    for body in bodies:
+        for _, line in body:
+            match = MAPPING_LINE.search(line)
+            if match:
+                found[match.group(1)] = parse_mapping(match.group(2))
+    return found
+
+
+def parse_items(body):
+    items = []
+    for number, line in body:
+        match = ITEM.match(line)
+        if not match:
+            continue
+        state, item_id, rest = match.groups()
+        mapping = parse_mapping(rest.split("→", 1)[1]) if "→" in rest else None
+        items.append({"line": number, "state": state, "id": item_id, "text": rest, "tcs": mapping})
+    return items
+
+
+def parse_evidence(body):
+    latest, problems = {}, []
+    for number, line in body:
+        match = EVIDENCE.search(line)
+        if not match:
+            continue
+        tc, rest = match.groups()
+        fields = {}
+        for part in rest.split("|"):
+            if ":" in part:
+                key, value = part.split(":", 1)
+                fields[key.strip()] = value.strip()
+        result = fields.get("result", "")
+        if result not in RESULTS:
+            problems.append((number, f"TC-{tc} evidence result must be one of {sorted(RESULTS)}, got {result!r}"))
+            continue
+        if not fields.get("output"):
+            problems.append((number, f"TC-{tc} evidence has no output excerpt"))
+        latest[tc] = (result, number)
+    return latest, problems
+
+
+def repo_has_verify_skill(root):
+    for directory, subdirs, files in os.walk(root):
+        subdirs[:] = [d for d in subdirs if d not in SKIP_DIRS]
+        if os.path.basename(directory).startswith("verify-") and "SKILL.md" in files:
+            return True
+    return False
+
+
+def repo_root(path):
+    current = os.path.abspath(os.path.dirname(path))
+    while True:
+        if os.path.exists(os.path.join(current, ".git")):
+            return current
+        parent = os.path.dirname(current)
+        if parent == current:
+            return os.path.abspath(os.path.dirname(path))
+        current = parent
+
+
+def lint(path, stage, repo):
+    with open(path, encoding="utf-8") as handle:
+        lines = handle.read().splitlines()
+    change_type = header_value(lines, "Change-Type")
+    if change_type is None:
+        return [], f"{path}: legacy spec (no Change-Type header); rules not enforced"
+
+    errors = []
+    first_section = next((i for i, line in enumerate(lines, 1) if line.startswith("## ")), 1)
+    if change_type not in CHANGE_TYPES:
+        errors.append((first_section, f"Change-Type must be one of {sorted(CHANGE_TYPES)}, got {change_type!r}"))
+
+    body = sections(lines)
+    for number, title in (("3", "Execution Plan"), ("4", "Test and Acceptance Criteria"), ("6", "Validation Evidence")):
+        if number not in body:
+            errors.append((first_section, f"missing section '## {number}. {title}'"))
+
+    tcs = parse_tcs(body.get("4", []))
+    if not tcs:
+        errors.append((first_section, "no TC entries in section 4"))
+    for tc, entries in sorted(tcs.items(), key=lambda kv: int(kv[0])):
+        if len(entries) > 1:
+            errors.append((entries[1]["line"], f"TC-{tc} is defined more than once"))
+        problem = method_error(entries[0]["method"])
+        if problem:
+            errors.append((entries[0]["line"], f"TC-{tc} {problem}"))
+
+    items = parse_items(body.get("3", []))
+    appended = appended_mappings(body.get("5", []), body.get("7", []))
+    for item in items:
+        if item["id"] in appended:
+            item["tcs"] = appended[item["id"]]
+    for item in items:
+        if item["tcs"] is None:
+            errors.append((item["line"], f"{item['id']} has no TC mapping (use '→ TC-n', '→ none (reason: ...)', or an appended 'mapping: {item['id']} → ...' line)"))
+            continue
+        for tc in item["tcs"]:
+            if tc not in tcs:
+                errors.append((item["line"], f"{item['id']} maps to TC-{tc}, which section 4 does not define"))
+
+    latest, problems = parse_evidence(body.get("6", []))
+    errors.extend(problems)
+    for item in items:
+        if item["state"] != "x" or not item["tcs"]:
+            continue
+        for tc in item["tcs"]:
+            result = latest.get(tc)
+            if result is None:
+                errors.append((item["line"], f"{item['id']} is [x] but TC-{tc} has no evidence"))
+            elif result[0] != "pass":
+                errors.append((item["line"], f"{item['id']} is [x] but the latest TC-{tc} result is {result[0]}"))
+
+    if stage == "close" and repo_has_verify_skill(repo or repo_root(path)):
+        update_done = any(
+            item["state"] == "x" and re.search(r"verify-update|maintain --scope", item["text"]) for item in items
+        )
+        not_needed = any(NOT_NEEDED.search(line) for _, line in body.get("5", []))
+        if not (update_done or not_needed):
+            errors.append((first_section, "project has a verify-<app> skill: complete a verification tool update item or log 'verify-update: not needed. Reason: ...'"))
+
+    return sorted(errors), None
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Check the machine-checkable rules of an immutable spec.")
+    parser.add_argument("--stage", choices=["activate", "close"], help="add the checks for this lifecycle step")
+    parser.add_argument("--repo", help="repository root used to detect a verify-<app> skill (default: the spec's Git root)")
+    parser.add_argument("specs", nargs="+")
+    args = parser.parse_args()
+
+    failed = False
+    for path in args.specs:
+        if not os.path.isfile(path):
+            print(f"{path}: error: file not found", file=sys.stderr)
+            sys.exit(2)
+        errors, notice = lint(path, args.stage, args.repo)
+        if notice:
+            print(notice)
+            continue
+        for number, message in errors:
+            print(f"{path}:{number}: error: {message}")
+        if errors:
+            failed = True
+        else:
+            print(f"{path}: ok")
+    sys.exit(1 if failed else 0)
+
+
+if __name__ == "__main__":
+    main()

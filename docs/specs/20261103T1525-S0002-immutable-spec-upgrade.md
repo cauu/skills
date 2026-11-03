@@ -115,15 +115,15 @@ TC-<n> | type: <change-type> | method: <verify | command | manual> | command: <c
 
 ## 3. Execution Plan
 
-- [ ] p1-1 `immutable-spec`：Change-Type、证据门槛表（带标记）、验证计划、激活检查
-- [ ] p1-2 `immutable-spec`：证据格式（含输出摘录）、结论用词、真实产物要求
-- [ ] p1-3 `immutable-spec`：bug 用 lite spec 模板
-- [ ] p1-4 关口 A、B 的记录格式与自主边界
-- [ ] p1-5 收尾检查
-- [ ] p1-6 `scripts/spec-lint` 与 fixtures；激活、关闭流程中加入运行要求
-- [ ] p1-7 `immutable-spec-orca`：声明依赖主版本，删除重复规则，保留交接内容并加入验收与实例隔离要求
-- [ ] p1-8 一致性检查脚本：主版本门槛表、orca 版引用、其他 skill 内联句子
-- [ ] p1-9 用 case designer 设计 `evals/immutable-spec/` 中 TC-2 至 TC-6 的用例，**先经用户审核，再实际运行**
+- [~] p1-1 `immutable-spec`：Change-Type、证据门槛表（带标记）、验证计划、激活检查
+- [~] p1-2 `immutable-spec`：证据格式（含输出摘录）、结论用词、真实产物要求
+- [~] p1-3 `immutable-spec`：bug 用 lite spec 模板
+- [~] p1-4 关口 A、B 的记录格式与自主边界
+- [~] p1-5 收尾检查
+- [x] p1-6 `scripts/spec-lint` 与 fixtures；激活、关闭流程中加入运行要求
+- [~] p1-7 `immutable-spec-orca`：声明依赖主版本，删除重复规则，保留交接内容并加入验收与实例隔离要求
+- [~] p1-8 一致性检查脚本：主版本门槛表、orca 版引用、其他 skill 内联句子
+- [~] p1-9 用 case designer 设计 `evals/immutable-spec/` 中 TC-2 至 TC-6 的用例，**先经用户审核，再实际运行**
 - [ ] p1-10 更新 README 与工作流概览
 
 ## 4. Test and Acceptance Criteria
@@ -168,6 +168,29 @@ TC-<n> | type: <change-type> | method: <verify | command | manual> | command: <c
 - 2026-11-03 关口 B 通过：用户批准激活并执行。决定人：用户。
 - 2026-11-03 激活。Task-ID 暂缺：Task-ID 规则在 S0009，本 spec 按现行 Spec-ID 规则执行。
 
+- 2026-11-03 p1-1 至 p1-9 started。
+- 2026-11-03 p1-1 至 p1-5 的规则都写在 `skills/engineering/immutable-spec/SKILL.md` 一个文件中，并且依赖 p1-9 的 eval 用例验收，而这些用例要先经用户审核才能运行。按例外第 2 条（条目已部分实现，验收标准尚未满足），这些条目暂缓提交，原因记录于此。
+- 2026-11-03 p1-6 completed：`skills/engineering/immutable-spec/scripts/spec-lint`（Python 3 标准库）；fixtures 与运行脚本在 `tests/spec-lint/`，不随 skill 分发。执行中新增：条目到 TC 的映射可以追加 `mapping:` 行（见 Change Requests）；没有 Change-Type 的旧 spec 跳过检查。
+- 2026-11-03 发现：仓库内其他 draft 和已完成的 S0008 都没有条目到 TC 的映射，`spec-lint` 会报错。属于预期：draft 在各自激活时补映射（激活检查会拦住）；S0008 已关闭，不回改。
+- 2026-11-03 p1-7、p1-8 实现完成：orca 版声明依赖 `immutable-spec` 并引用其验收规则；一致性检查脚本 `scripts/check-skill-consistency.py` 和变更测试 `tests/consistency/run.sh`。等主版本规则一起提交，避免中间提交出现 orca 引用了尚不存在的章节。
+- 2026-11-03 p1-9 用例设计完成：新增 6 个用例，见 `evals/immutable-spec/case-review.md`。不调用 agent 的检查已完成（fixture lint、12 个模拟结果的断言判定、泄漏检查）。等待用户审核，审核通过后再实际运行。
+
 ## 6. Validation Evidence (append-only)
 
+- 2026-11-03 TC-1 | type: feature | method: command | command: tests/spec-lint/run.sh | exit: 0 | output: 17 fixtures ok, "spec-lint fixtures: 0 failure(s)"; covers missing method, manual without reason, bad result, missing output excerpt, [x] with inconclusive or no evidence, unmapped item, unknown TC, close stage with and without verify skill, appended mappings, legacy, valid | result: pass | note: run after the appended-mapping change
+- 2026-11-03 TC-7 | type: feature | method: command | command: scripts/check-skill-consistency.py && tests/consistency/run.sh | exit: 0 | output: "ok: 4 gates in immutable-spec, 7 skills checked"; mutations: inlined gate drift, base gate change, missing gate, renamed referenced section all exit 1; "consistency mutations: 0 failure(s)" | result: pass | note: no skill inlines a gate yet, so the test adds a stand-in skill in a disposable copy
+- 2026-11-03 TC-8 | type: feature | method: command | command: spec-lint --stage activate skills/engineering/immutable-spec/references/lite-spec-template.md | exit: 0 | output: "lite-spec-template.md: ok"; template has Reproduction record, Root cause, Fix, Verification (TC-1 fail before / pass after) | result: pass | note: -
+
 ## 7. Change Requests (append-only)
+
+- 2026-11-03 执行中发现：`spec-lint` 只有知道每个条目对应哪些 TC，才能检查“`[x]` 条目有 pass 证据”。执行计划因此新增条目到 TC 的映射（`→ TC-n` 或 `→ none (reason: ...)`）。激活后计划文字冻结，映射改为追加 `mapping:` 行，最新一行生效。本 spec 在规则出现前激活，按此方式追加映射。属于 Scope 第 10 项的实现细节，不扩大范围。
+- 2026-11-03 mapping: p1-1 → TC-1, TC-2
+- 2026-11-03 mapping: p1-2 → TC-1, TC-3
+- 2026-11-03 mapping: p1-3 → TC-8
+- 2026-11-03 mapping: p1-4 → TC-4, TC-5
+- 2026-11-03 mapping: p1-5 → TC-1, TC-6
+- 2026-11-03 mapping: p1-6 → TC-1
+- 2026-11-03 mapping: p1-7 → TC-7
+- 2026-11-03 mapping: p1-8 → TC-7
+- 2026-11-03 mapping: p1-9 → TC-2, TC-3, TC-4, TC-5, TC-6, TC-9
+- 2026-11-03 mapping: p1-10 → none (reason: documentation only)
