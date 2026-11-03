@@ -121,7 +121,7 @@ TC-<n> | type: <change-type> | method: <verify | command | manual> | command: <c
 - [x] p1-4 关口 A、B 的记录格式与自主边界
 - [x] p1-5 收尾检查
 - [x] p1-6 `scripts/spec-lint` 与 fixtures；激活、关闭流程中加入运行要求
-- [~] p1-7 `immutable-spec-orca`：声明依赖主版本，删除重复规则，保留交接内容并加入验收与实例隔离要求
+- [x] p1-7 `immutable-spec-orca`：声明依赖主版本，删除重复规则，保留交接内容并加入验收与实例隔离要求
 - [~] p1-8 一致性检查脚本：主版本门槛表、orca 版引用、其他 skill 内联句子
 - [~] p1-9 用 case designer 设计 `evals/immutable-spec/` 中 TC-2 至 TC-6 的用例，**先经用户审核，再实际运行**
 - [ ] p1-10 更新 README 与工作流概览
@@ -183,6 +183,8 @@ TC-<n> | type: <change-type> | method: <verify | command | manual> | command: <c
 - 2026-11-03 p1-1 至 p1-5 completed：`immutable-spec` 新增 Core Rules 10–11、`Change-Type` 头部、门槛块（带 gate 标记）、Verification Plan and Activation Check、Decision Gates and Autonomy、收尾检查、新证据格式与四种结论、`references/lite-spec-template.md`；旧 spec（无 Change-Type）沿用原规则。经用户批准合并为一次提交。
 - 2026-11-03 第一次全量运行：`closure-without-verify` 失败，原因是 fixture 的证据（单元测试和 grep HTML）不满足其自身的 feature 门槛，agent 拒绝关闭是正确行为。按已批准的用例描述修正 fixture（改为真实 CLI 命令及其输出），意图和断言不变，记录于 case-review.md。
 - 2026-11-03 第二次全量运行：`no-self-selected-task` 的 asksUser 检查失败，agent 实际做法正确（没有改动，用“I need you to choose”请用户选择，但没用问号）。放宽 asksUser 的匹配词，决定性检查不变；S0004 fixture 改为独立内容。记录于 case-review.md，单独重跑该用例通过。
+
+- 2026-11-03 p1-7 completed：orca 版声明依赖 immutable-spec，引用其验收规则，交接内容加入验证计划与实例隔离。
 
 ## 6. Validation Evidence (append-only)
 

@@ -1,6 +1,6 @@
 ---
 name: immutable-spec-orca
-description: Activate task-scoped append-only specs and hand full delivery ownership to one execution agent in an Orca worktree, using Codex by default or an explicitly user-selected agent/model. Use when a real Task-ID must remain traceable from claim through implementation, integration, and closure, while the activating agent must stop after a verified full handoff. Do not use for supervised workers, coordinator loops, or ordinary single-agent work without a task claim.
+description: Activate task-scoped append-only specs and hand full delivery ownership to one execution agent in an Orca worktree, using Codex by default or an explicitly user-selected agent/model. Requires the immutable-spec skill. Use when a real Task-ID must remain traceable from claim through implementation, integration, and closure, while the activating agent must stop after a verified full handoff. Do not use for supervised workers, coordinator loops, or ordinary single-agent work without a task claim.
 ---
 
 # Immutable Spec Orca
@@ -12,6 +12,18 @@ one Task-ID = one active spec = one execution worktree = one delivery owner
 ```
 
 Do not combine this skill's identity, lifecycle, evidence, or commit rules with a supervised orchestration workflow.
+
+<!-- requires: immutable-spec -->
+**Requires the `immutable-spec` skill.** This skill adds task identity and the Orca handoff on top of it. Read `immutable-spec` before using this skill, and apply these of its sections unchanged:
+
+- Change Types and Evidence Gates
+- Verification Plan and Activation Check
+- Decision Gates and Autonomy
+- Item State Progression
+- Validation Evidence
+- the closure rules: `spec-lint --stage close` and the verification tool update
+
+Run its `scripts/spec-lint` from the installed `immutable-spec` skill directory. Where this skill and `immutable-spec` differ, this skill's identity, location, ownership, handoff, and commit rules win.
 
 ## Authority Model
 
@@ -75,6 +87,7 @@ Task-System:
 Task-ID:
 Task-URL:
 Status: draft | active | completed
+Change-Type: feature | optimization | bugfix | refactor
 Activation Owner:
 Execution Owner:
 Target Branch:
@@ -104,8 +117,9 @@ The Activation Owner:
 2. Creates the draft using the exact Task-ID.
 3. Clarifies requirements, constraints, non-goals, design, items, and acceptance criteria with the user.
 4. Resolves the execution agent and model, then confirms one worktree owner can deliver the task.
-5. On user approval, moves the spec to `docs/specs/active/`, sets `Status: active`, records Start Time, Activation Owner, and Target Branch, then commits only the activation state.
-6. Captures that exact activation commit as the worktree base.
+5. Runs `spec-lint --stage activate` on the draft, fixes every error, and lists every `manual` TC to the user with the activation request.
+6. On user approval, appends the gate B line, moves the spec to `docs/specs/active/`, sets `Status: active`, records Start Time, Activation Owner, and Target Branch, then commits only the activation state.
+7. Captures that exact activation commit as the worktree base.
 
 User approval to activate authorizes the full handoff and authorizes the Worktree Owner to integrate and close the task after every spec gate passes, unless the user explicitly requires another review gate.
 
@@ -141,7 +155,8 @@ Create one child worktree from the exact activation commit and launch one agent 
 - concrete outcome and files, components, or environment in scope;
 - constraints, invariants, non-goals, and user-owned files that must remain untouched;
 - item IDs and mapped acceptance criteria;
-- observable validation commands or manual checks;
+- the verification plan: every TC with its method, the spec's evidence gate, and the instruction to record evidence lines with output excerpts as `immutable-spec` requires;
+- isolation: when the application must run in this worktree, use ports, data directories, and profiles that do not collide with other worktrees, and never drive an instance this worktree did not start;
 - commit format and integration/closure requirements;
 - full ownership of clarification, implementation, validation, merge, spec completion, and task closure;
 - instruction to avoid contacting or waiting for the Activation Owner;
@@ -158,13 +173,13 @@ The handoff prompt must make the Worktree Owner responsible for the entire remai
 1. Verify Task-ID, active spec path, claim, base commit, target branch, and absence of a competing owner.
 2. Append the handoff receipt and execution-owner identity if the Activation Owner could not record them before delivery.
 3. Work only on this task and implement one item at a time.
-4. Mark `[~]` only when an item starts and `[x]` only after mapped acceptance passes.
+4. Mark `[~]` only when an item starts and `[x]` only when the latest evidence of every mapped TC is `pass`. Stop and ask the user about any TC whose result is `inconclusive`.
 5. Append execution notes and validation evidence before completing each item.
 6. Commit each completed item using the required task metadata.
 7. Resolve in-scope defects with appended Change Requests; do not silently broaden the task.
 8. Integrate reviewed work into the target branch without rewriting shared history.
 9. Verify the expected commits or equivalent changes are reachable from the target branch and run target-branch validation.
-10. Set `Status: completed`, record Completion Time and Closure Reason, move the spec to `docs/specs/completed/`, commit closure, close the task in its task system, and leave a durable final report.
+10. Run `spec-lint --stage close`, apply the verification tool update rule, then set `Status: completed`, record Completion Time and Closure Reason, move the spec to `docs/specs/completed/`, commit closure, close the task in its task system, and leave a durable final report.
 
 If clarification is required, the Worktree Owner asks the user in its own session. It must not route questions through the Activation Owner or assume that the activating session is still running.
 
@@ -178,10 +193,10 @@ Use item IDs such as `p1-1`, `p1-2`, and `p2-1-fix1`, with these checkbox states
 
 `[x]` does not by itself prove integration or task closure.
 
-Use one evidence line per acceptance check:
+Record evidence exactly as `immutable-spec` requires (Validation Evidence), and add `actor: worktree-owner` after the TC identifier:
 
 ```text
-TC-<n> | actor: worktree-owner | stack: <stack> | command: <command or manual step> | result: <pass|fail> | note: <observation>
+- <date> TC-<n> | actor: worktree-owner | type: <change-type> | method: <verify|command|manual> | command: <cmd> | exit: <code> | output: <key output lines> | result: <pass|fail|inconclusive|unreachable> | note: <observation>
 ```
 
 Never record a pass without an executed command or explicit manual observation. Required validation failure blocks item completion.
