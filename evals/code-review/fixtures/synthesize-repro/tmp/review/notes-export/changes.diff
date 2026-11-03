@@ -1,0 +1,29 @@
+diff --git a/bin/notes.js b/bin/notes.js
+new file mode 100755
+--- /dev/null
++++ b/bin/notes.js
+@@ -0,0 +1,12 @@
++#!/usr/bin/env node
++const fs = require('fs');
++const path = require('path');
++const { exportCsv } = require('../src/Export');
++
++const [command] = process.argv.slice(2);
++if (command !== 'export') {
++  console.error('usage: notes export');
++  process.exit(2);
++}
++const notes = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'notes.json'), 'utf8'));
++console.log(exportCsv(notes));
+diff --git a/src/export.js b/src/export.js
+new file mode 100644
+--- /dev/null
++++ b/src/export.js
+@@ -0,0 +1,7 @@
++// Export notes as CSV: a header line, then one line per note.
++function exportCsv(notes) {
++  const rows = notes.map((n) => [n.id, n.title, n.body].join(','));
++  return ['id,title,body', ...rows].join('\n');
++}
++
++module.exports = { exportCsv };

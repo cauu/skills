@@ -35,4 +35,5 @@ Ask: "What's the public interface, and which seams should we test?"
 
 - **Red before green.** Write the failing test first, then only enough code to pass it. Don't anticipate future tests or add speculative features.
 - **One slice at a time.** One seam, one test, one minimal implementation per cycle.
+- **Bugs: reproduce first.** For a bug, the first red is a test at the entry point where the bug was reported. Run it and see it fail for the reported reason before touching the fix. When you commit, the failing test lands in its own commit before the fix, so the history shows red, then green. If you cannot make it fail, stop and report the paths you tried instead of fixing blind.
 - **Refactoring is not part of the loop.** It belongs to the review stage (see the `code-review` skill), not the red → green implementation cycle.

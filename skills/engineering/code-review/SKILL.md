@@ -45,7 +45,9 @@ Scope precedence:
    `master...HEAD`.
 4. If no scope can be inferred, ask the user.
 
-Never discover or interpret another skill's files or conventions. A review
+Never discover or interpret another skill's files or conventions, except a
+project `verify-<app>` skill used optionally to reproduce findings (see
+Re-confirmation). A review
 standard is used only when the user explicitly supplies it or identifies its
 path. Treat it as an ordinary input document and do not require a particular
 filename, directory, ID scheme, heading structure, or commit format.
@@ -199,23 +201,39 @@ before writing them into the summary:
 
 1. Re-verify EVERY P0/P1 finding and EVERY multi-agent finding by reading the
    referenced `file:line` in the real diff/code.
-2. Spot-check single-agent P2/P3 findings; drop or downgrade ones that don't hold.
-3. Give each retained finding a `证据状态:` verdict — either `证据支持` (the code
-   supports the candidate, still pending human confirmation) or `需要确认`
-   (a concrete trigger and plausible impact exist, but evidence is incomplete).
-   Candidates that do not hold are `已排除`; omit them from the checklist and
-   optionally list them under an exclusion note with the reason.
-4. If agents disagree on the same spot, resolve it by reading the code and state
+2. Try to reproduce EVERY P0/P1 finding that holds after reading: run its
+   trigger against the real code and observe the impact. Prefer the project's
+   `verify-<app>` skill (a `verify-*` directory under `.claude/skills/`,
+   `.agents/skills/`, or another agent skill directory at the project root) when
+   one exists and covers the path; otherwise use existing tests, the app's own
+   command or entry point, or a minimal script. Put every repro file under
+   `tmp/review/<feature>/`; never edit product code to reproduce.
+3. Spot-check single-agent P2/P3 findings; drop or downgrade ones that don't hold.
+4. Give each retained finding a `证据状态:` verdict — `证据支持（已复现）` (a run
+   showed the impact; record the `复现:` command and an excerpt of its output),
+   `证据支持` (the code supports the candidate, still pending human
+   confirmation), or `需要确认` (a concrete trigger and plausible impact exist,
+   but evidence is incomplete). A P0/P1 that was not reproduced keeps its
+   code-reading verdict and records `复现尝试:` — each path tried and why it did
+   not reproduce: it ran and the impact did not appear (`inconclusive`), or it
+   could not run, naming the missing precondition (`unreachable`). Candidates
+   that do not hold are `已排除`; omit them from the checklist and optionally
+   list them under an exclusion note with the reason.
+5. If agents disagree on the same spot, resolve it by reading the code and state
    which side the current evidence supports. Preserve genuine uncertainty.
 
 Finish by reporting to the user IN CHINESE: counts per severity, how many findings
-each agent raised, how many were raised by multiple agents, where the files are,
+each agent raised, how many were raised by multiple agents, how many P0/P1 were
+reproduced, where the files are,
 and that every result is advisory until they confirm it. The `summary.md`
 checkboxes are theirs to tick; fixes are out of scope.
 
 ## Guardrails
 
 - Review-only. Never edit product code, never commit, never revert user changes.
+- Reproduction runs read-oriented: repro scripts and their output stay under
+  `tmp/review/<feature>/`; do not run commands that write to shared or remote
+  state.
 - Never treat reviewer agreement or the orchestrating agent's evidence check as
   final human confirmation.
 - Keep external-agent invocations read-oriented; do not pass `--force`/`--yolo`.

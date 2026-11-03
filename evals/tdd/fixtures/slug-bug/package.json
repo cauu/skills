@@ -1,0 +1,7 @@
+{
+  "name": "slug",
+  "private": true,
+  "scripts": {
+    "test": "node --test"
+  }
+}
