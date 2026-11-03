@@ -85,7 +85,7 @@ provider 配置在 p1-1 中确认：
 
 ## 3. Execution Plan
 
-- [ ] p1-1 小范围试验：确认认证方式、模型名、写权限、只加载项目 skill、关闭网络这五项能否满足；再确认 skills.sh 不会把 `.claude/skills/skill-eval-case-designer` 当作可安装的 skill 列出（会的话改放到其他目录）。结论追加到 Execution Log。任何一项无法满足时停下来，报告给用户
+- [x] p1-1 小范围试验：确认认证方式、模型名、写权限、只加载项目 skill、关闭网络这五项能否满足；再确认 skills.sh 不会把 `.claude/skills/skill-eval-case-designer` 当作可安装的 skill 列出（会的话改放到其他目录）。结论追加到 Execution Log。任何一项无法满足时停下来，报告给用户
 - [ ] p1-2 `package.json` 固定 Promptfoo 版本；编写 `evals/run.sh`
 - [ ] p1-3 移植 `skill-eval-case-designer` 到 `.claude/skills/`，改成 Claude 和 `evals/<skill>/` 的写法
 - [ ] p1-4 用 case designer 设计 `immutable-spec.no-commit-without-evidence`，人工审核后实际运行
@@ -114,6 +114,24 @@ provider 配置在 p1-1 中确认：
 - 2026-11-03 草稿创建。被测 agent 使用 Claude（用户决定）。
 - 2026-11-03 关口 B 通过：用户批准激活并执行。决定人：用户。认证方式：本机 Claude 登录；用户接受运行成本。
 - 2026-11-03 激活。Task-ID 暂缺：Task-ID 标识规则尚未落地（S0002 范围），本 spec 按现行 Spec-ID 规则执行。
+
+- 2026-11-03 p1-1 started：在 `/tmp/s0008-spike` 中用一个临时 probe skill 试验。
+- 2026-11-03 p1-1 结论（6 项全部满足）：
+  - 认证：`apiKeyRequired: false`，在不设置 `ANTHROPIC_API_KEY` 的情况下使用本机 Claude 登录，可以调用。
+  - 模型：Promptfoo 0.122.0 依赖的 claude-agent-sdk 0.3.220 自带 Claude Code 2.1.220，调用 `claude-opus-5-5` 时 API 返回 400（要求 2.1.280 及以上）。设置 `path_to_claude_code_executable` 指向本机 Claude Code 2.1.317 后调用成功；结果中 `modelUsage` 记录为 `claude-opus-5-5`。Promptfoo 会提示 unknown model，属于正常现象。单次运行约 0.15 美元。
+  - 写权限：`permission_mode: acceptEdits` 加 `append_allowed_tools: [Write, Edit, Bash]`，agent 成功写入文件。
+  - 只加载项目 skill：`setting_sources: [project]` 加 `skills: [probe]`，agent 列出的可用 skill 只有 `probe`。
+  - 网络：`sandbox.enabled` 加 `network.allowedDomains: []`，`curl https://example.com` 被沙箱代理拒绝（403，exit=56）。
+  - 环境变量：provider 会把父进程的全部环境变量传给 agent。用 `env -i` 只放行 PATH、HOME、USER、TMPDIR、LANG 和 PROMPTFOO_* 后，父进程中设置的 `FOO_SECRET` 在 agent 中为 unset，本机登录仍然可用。
+  - skills.sh：1.7.6 会扫描 `.claude/skills/`。frontmatter 中设置 `metadata.internal: true` 后，`skills add <repo> --list` 不再列出该 skill（本地测试仓库验证）。
+- 2026-11-03 p1-1 带来的设计决定（在 Scope 范围内，属于实现细节）：
+  - 运行环境使用 Node 24（Promptfoo 0.122.0 要求 Node 22.22.0 及以上；本机默认 22.21.1，已安装的 24.12.0 满足要求）。`evals/run.sh` 中检查 Node 版本。
+  - provider 配置 `path_to_claude_code_executable`，由 `run.sh` 通过 `command -v claude` 解析，不写死路径。
+  - `run.sh` 用 `env -i` 加放行列表启动 Promptfoo。
+  - 读取文件的断言写成独立的 `.js` 文件，通过 `file://` 引用（内联 JS 断言中不能使用 `require`）。
+  - `skill-eval-case-designer` 放在 `.claude/skills/`，frontmatter 中设置 `metadata.internal: true`。
+- 2026-11-03 p1-1 completed：无对应 TC；试验结论记录在上面的日志中。
+- 2026-11-03 更正：头部的 Created Time（16:00）晚于 Start Time（14:42），是起草时写错了。实际创建时间早于 14:42。按只追加规则不修改头部，在此记录。
 
 ## 6. Validation Evidence (append-only)
 
