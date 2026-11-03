@@ -3,11 +3,11 @@
 Spec-ID: S0002
 Task-ID: (待建)
 Change-Type: feature
-Status: draft
+Status: active
 Created Time: 2026-11-03T13:55:00+08:00
-Start Time:
+Start Time: 2026-11-03T15:25:41+08:00
 Completion Time:
-Previous Spec-ID:
+Previous Spec-ID: S0008
 Closure Reason:
 
 ## 1. Requirement Details
@@ -164,6 +164,9 @@ TC-<n> | type: <change-type> | method: <verify | command | manual> | command: <c
   - orca 版改为声明依赖主版本，其他可单独安装的 skill 内联自己的门槛，并加一致性检查；
   - eval 用例先审核再运行（吸取 S0008 p1-4 的教训）；
   - 新增 TC-9，防止回归。
+
+- 2026-11-03 关口 B 通过：用户批准激活并执行。决定人：用户。
+- 2026-11-03 激活。Task-ID 暂缺：Task-ID 规则在 S0009，本 spec 按现行 Spec-ID 规则执行。
 
 ## 6. Validation Evidence (append-only)
 
