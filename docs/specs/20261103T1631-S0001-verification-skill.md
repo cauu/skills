@@ -144,7 +144,7 @@ p1 交付 skill 文本，用静态检查（TC-1、TC-8）验收；skill 的行�
 - [x] p1-4 编写 SKILL.md 的 maintain（局部和全量） → TC-1
 - [x] p1-5 编写 `references/feature-map-example/`（含 `Source entry points`） → TC-1
 - [x] p1-6 补充 `agents/openai.yaml`，更新 README（工作流概览由用户维护，本 spec 不修改） → TC-1
-- [~] p1-7 用 case designer 设计 `evals/verification/` 用例，先不调用 agent 验证用例本身，经用户审核后再实际运行 → TC-9, TC-10, TC-11, TC-12
+- [x] p1-7 用 case designer 设计 `evals/verification/` 用例，先不调用 agent 验证用例本身，经用户审核后再实际运行 → TC-9, TC-10, TC-11, TC-12
 - [ ] p2-1 试点 A：在一个 Web 或 CLI 项目上运行 create（项目待定） → TC-2, TC-3, TC-4
 - [ ] p2-2 试点 B：在一个 Aiken 项目上运行 create，与 `aiken-debug` 对照（项目待定） → TC-5
 - [ ] p2-3 局部更新试点：在试点 A 上做一次新增功能的改动，运行 `maintain --scope` → TC-6
@@ -236,6 +236,8 @@ TC-2 至 TC-7 在试点项目上运行，试点项目由用户在 p2 开始前�
 
 - 2026-11-03 p1-4-fix1 completed：SKILL.md 的 `changed` 结论改为 “Only a full pass sets `Last full run:` to this run; a scoped pass leaves it”。第三次整套运行（cauu-skill-eval.6AYJhG，基于修正后的 skill）中 maintain-scope 的工作区 `Last full run:` 保持 20261101T100000Z-notes，提交 b5dd1aa 只改 features/README.md 和 features/search.md。
 
+- 2026-11-03 p1-7 completed：第三次整套运行（cauu-skill-eval.6AYJhG，基于修正后的 skill）4 个用例全部通过，exit 0；共做了 1 处用例修正（driftFixed 的检查范围，见 case-review.md）和 1 处 skill 修正（p1-4-fix1）。所有 create 运行中沙箱都拒绝写 `.claude/skills/`，只写出了 `.agents/skills/` 包装，用例按已批准的判断接受；试点要确认两个包装都写出。模拟验证 20 个结果全部判对。
+
 ## 6. Validation Evidence (append-only)
 
 - 2026-11-03 TC-8 | type: feature | method: command | command: tests/verification/layout.sh | exit: 0 | output: "ok claude-wrapper-only: update required (exit 1)", "ok agents-wrapper-only: update required (exit 1)", "ok both-wrappers: update required (exit 1)", "ok body-without-wrapper: ok (exit 0)", "verification layout: 0 failure(s)" | result: pass | note: runs the real spec-lint --stage close against temporary repos laid out per D1
@@ -246,5 +248,8 @@ TC-2 至 TC-7 在试点项目上运行，试点项目由用户在 p2 开始前�
 - 2026-11-03 TC-1 | type: feature | method: command | command: tests/verification/structure.sh | exit: 0 | output: 36 ok lines across contract, feature-map, skill, meta, including "ok result words: pass fail inconclusive unreachable", "ok name: verification", "ok SKILL.md requires no other skill", "ok maintain outcomes: clean changed blocked", "ok openai.yaml has allow_implicit_invocation", "ok README lists verification"; "verification structure (contract feature-map skill meta): 0 failure(s)" | result: pass | note: full run (all parts) after p1-6
 - 2026-11-03 TC-1 | type: feature | method: command | command: tests/verification/structure.sh | exit: 0 | output: "ok maintain outcomes: clean changed blocked", "verification structure (contract feature-map skill meta): 0 failure(s)" | result: pass | note: after p1-4-fix1
 - 2026-11-03 TC-12 | type: feature | method: command | command: npm run eval:verification | exit: 0 | output: verification.maintain-scope-only-mapped pass; checks {newFeatureMapped, newFeatureIndexed, newFeatureDriven, unaffectedNotDriven, unaffectedNotEdited, productUnchanged, oneCommit} all true; "Evidence is in .verify-artifacts/20261103T110120Z-workspace/search/"; workspace keeps "Last full run: 20261101T100000Z-notes" | result: pass | note: suite run cauu-skill-eval.6AYJhG (4 passed), after p1-4-fix1
+- 2026-11-03 TC-9 | type: feature | method: command | command: npm run eval:verification | exit: 0 | output: verification.create-proves-before-handover pass; checks {wrapperNamedVerifyApp, wrapperPointsToBody, contractCopiedVerbatim, featureMapShaped, lastRunRecorded, evidenceSurvivedCleanup, evidenceIgnored, toolCommitted, productUnchanged} all true; "A full test run passed and it's committed as d1594fb, with one gap: the Claude Code wrapper is missing" | result: pass | note: suite run cauu-skill-eval.6AYJhG; the sandbox blocked .claude/skills writes, the .agents wrapper was written
+- 2026-11-03 TC-10 | type: feature | method: command | command: npm run eval:verification | exit: 0 | output: verification.create-unrunnable-stays-draft pass; checks {notHandedOverAsProven, noCommit, productUnchanged, namesBlocker} all true; "The verification tool for notes-api is written but is only a draft. I couldn't launch the app here, so I did not commit it." | result: pass | note: suite run cauu-skill-eval.6AYJhG
+- 2026-11-03 TC-11 | type: feature | method: command | command: npm run eval:verification | exit: 0 | output: verification.maintain-reports-regression pass; checks {driftFixed, headerStillExpected, productUnchanged, onlyToolFilesChanged, oneCommit, reportsRegression, outcomeChanged} all true; "The outcome is changed: I fixed and committed the tool's docs (627e75b). The pass also found one product regression in export, which I did not touch." | result: pass | note: suite run cauu-skill-eval.6AYJhG, after the driftFixed scope change recorded in case-review.md
 
 ## 7. Change Requests (append-only)

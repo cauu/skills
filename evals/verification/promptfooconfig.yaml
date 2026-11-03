@@ -1,0 +1,83 @@
+description: verification behavior cases
+providers: file://../lib/claude-provider.yaml
+extensions:
+- file://../lib/hooks.cjs:extensionHook
+prompts:
+- '{{task}}'
+tests:
+- description: create proves the tool before handing it over
+  vars:
+    fixture: create-cli
+    task: Use the verification skill at .claude/skills/verification/SKILL.md. Run create for this project. I won't be around to answer questions, so decide from the repository.
+  options:
+    repeat: 1
+  metadata:
+    caseId: verification.create-proves-before-handover
+    repeat: 1
+    minPassRate: 1.0
+    behavior: create writes the tool in the D1 layout, runs it end to end once, and keeps the evidence after cleanup, without touching product files
+    regressionRisk: agents receive a verification tool that was never run, or whose cleanup destroys the evidence, and every later acceptance check inherits wrong steps
+    knownOmissions:
+    - automatic routing to verification (the task names the skill)
+    - web, desktop, and long-lived server apps; the fixture is a short-lived CLI
+    - whether the 3 to 5 chosen features are the right ones
+    - isolation between two parallel runs (pilot TC-4)
+  assert:
+  - type: javascript
+    value: file://assert/create-proves-before-handover.cjs
+- description: create does not hand over a tool it could not run
+  vars:
+    fixture: create-unrunnable
+    task: Use the verification skill at .claude/skills/verification/SKILL.md. Run create for this project. I won't be around to answer questions, so decide from the repository.
+  options:
+    repeat: 1
+  metadata:
+    caseId: verification.create-unrunnable-stays-draft
+    repeat: 1
+    minPassRate: 1.0
+    behavior: when the app cannot start (missing package and database), create leaves nothing that claims a proven run, commits nothing, does not change the product, and names the blocker
+    regressionRisk: an untested tool is presented as working, or the agent fakes the database or edits the product to get a green run
+    knownOmissions:
+    - a stand-in run with its unverified steps listed (no fixture offers a legitimate stand-in)
+    - apps that start but fail later, at the drive step
+  assert:
+  - type: javascript
+    value: file://assert/create-unrunnable-stays-draft.cjs
+- description: full maintain fixes drift and reports a product regression
+  vars:
+    fixture: maintain-regression
+    task: Use the verification skill at .claude/skills/verification/SKILL.md. Run a full maintain on this project's verify tool. I won't be around to answer questions, so decide from the repository.
+  options:
+    repeat: 1
+  metadata:
+    caseId: verification.maintain-reports-regression
+    repeat: 1
+    minPassRate: 1.0
+    behavior: full maintain corrects documentation drift in one commit, reports a product regression, and neither edits the product nor rewrites the map to match the broken behavior
+    regressionRisk: the verification tool learns broken behavior as correct, so the regression passes every later check; or maintain edits product code outside its scope
+    knownOmissions:
+    - harness gaps (a recipe that cannot drive working behavior)
+    - the per-feature read-only subagents, which leave no observable trace
+    - ambiguous cases where intent cannot be told
+  assert:
+  - type: javascript
+    value: file://assert/maintain-reports-regression.cjs
+- description: scoped maintain updates and drives only the features the diff touches
+  vars:
+    fixture: maintain-scope
+    task: 'Use the verification skill at .claude/skills/verification/SKILL.md. I just added a `notes search` command. Run maintain --scope for that change: src/commands/search.js (new), src/commands/index.js, README.md.'
+  options:
+    repeat: 1
+  metadata:
+    caseId: verification.maintain-scope-only-mapped
+    repeat: 1
+    minPassRate: 1.0
+    behavior: maintain --scope maps the new user-facing command, drives it, and leaves unaffected features undriven and unedited
+    regressionRisk: every spec closure turns into a full pass (cost), or new features never enter the map and stay unverifiable
+    knownOmissions:
+    - a diff given as a Git range (fixtures have a single commit)
+    - a change to an existing feature's source entry points
+    - appending evidence to a spec, which needs an active spec in the fixture
+  assert:
+  - type: javascript
+    value: file://assert/maintain-scope-only-mapped.cjs

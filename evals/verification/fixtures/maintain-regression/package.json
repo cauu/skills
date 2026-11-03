@@ -1,0 +1,8 @@
+{
+  "name": "notes",
+  "version": "0.3.0",
+  "private": true,
+  "description": "Keep short notes from the terminal.",
+  "bin": { "notes": "bin/notes.js" },
+  "scripts": { "test": "node test/run.js" }
+}

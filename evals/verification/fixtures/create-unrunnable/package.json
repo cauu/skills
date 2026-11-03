@@ -1,0 +1,14 @@
+{
+  "name": "notes-api",
+  "version": "1.4.0",
+  "private": true,
+  "description": "HTTP API for shared notes, backed by PostgreSQL.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "db:setup": "psql \"$DATABASE_URL\" -f schema.sql"
+  },
+  "dependencies": {
+    "pg": "^8.11.3"
+  }
+}
