@@ -78,7 +78,7 @@ pstack 有技术设计能力（`architect`、`arena`、Prototype playbook、mult
 
 - [ ] p1-1 编写 SKILL.md（完整流程、简化版、跳过条件、内联证据门槛） → TC-1, TC-8
 - [x] p1-2 编写 `references/design-red-flags.md`，与 `codebase-design` 对齐 → TC-10
-- [ ] p1-3 编写 `references/rationale-template.md`、`references/decision-brief.md` → TC-11
+- [x] p1-3 编写 `references/rationale-template.md`、`references/decision-brief.md` → TC-11
 - [ ] p1-4 `immutable-spec-orca` 第 3 步改为指向本 skill（可选读取） → TC-9
 - [ ] p1-5 补充 `agents/openai.yaml`，更新 README（工作流概览 `docs/ai-engineering-workflow-overview.md` 未纳入版本控制，本 spec 不改） → TC-12
 - [ ] p1-6 用 case designer 设计 `evals/spec-design/` 中 TC-2 至 TC-7 的用例，加入 `npm run eval:spec-design`，**先经用户审核，再实际运行** → TC-2, TC-3, TC-4, TC-5, TC-6, TC-7
@@ -129,9 +129,11 @@ pstack 有技术设计能力（`architect`、`arena`、Prototype playbook、mult
 - 2026-11-03 gate B passed: user approved activating and delivering S0007 ("按照这个顺序继续推进"). Decided by: user.
 - 2026-11-03 激活。无 manual TC。spec-lint --stage activate: ok。Task-ID 暂缺：Task-ID 规则在 S0009，本 spec 按现行 Spec-ID 规则执行。
 - 2026-11-03 p1-2 completed：`references/design-red-flags.md` 取 pstack architect 的清单（浅模块、信息泄漏、时间顺序分解、透传方法、所有权分裂、一件事两种做法、内部可导入、手工同步的列表），另加“调用方必须懂内部规则”“只有一个 adapter 的 seam”；术语指向 `codebase-design`，未安装时只给一句白话说明，不重新定义。同时新增 `tests/spec-design/run.sh`（TC-1、TC-8 至 TC-12 的检查），在任何 skill 文件存在前运行，6 项全部失败，符合预期。
+- 2026-11-03 p1-3 completed：`references/rationale-template.md`（问题、调用方视角、结构、已决问题及原型证据、取舍、被否决的方案、待决问题；调用方视角先写），`references/decision-brief.md`（单个决定的格式：选项、推荐、依据、风险、需要用户做什么；关口 A、关口 B 的提请格式；bug 版关口 A 换成复现记录和根因）。
 
 ## 6. Validation Evidence (append-only)
 
 - 2026-11-03 TC-10 | type: feature | method: command | command: tests/spec-design/run.sh red-flags | exit: 0 | output: "ok   red-flags", "spec-design checks: 0 failure(s)" | result: pass | note: before the file existed the same check failed with "missing .../design-red-flags.md", "does not point to codebase-design"
+- 2026-11-03 TC-11 | type: feature | method: command | command: tests/spec-design/run.sh templates | exit: 0 | output: "ok   templates", "spec-design checks: 0 failure(s)" | result: pass | note: before the files existed the check listed every missing heading (Problem, Caller's view, Shape, Tradeoffs, Rejected designs, Open questions) and field (Recommendation, Basis, Risk)
 
 ## 7. Change Requests (append-only)
