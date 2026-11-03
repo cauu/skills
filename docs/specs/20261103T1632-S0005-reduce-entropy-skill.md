@@ -43,7 +43,7 @@ SKILL.md 分“扫描”和“处理”两段，输出熵源清单、每项处�
 
 ## 3. Execution Plan
 
-- [ ] p1-1 编写 SKILL.md（内联 refactor 门槛） → TC-1, TC-2, TC-3, TC-4
+- [~] p1-1 编写 SKILL.md（内联 refactor 门槛） → TC-1, TC-2, TC-3, TC-4
 - [ ] p1-2 补充 `agents/openai.yaml`，更新 README → none (reason: 元数据和文档，不改变 agent 行为)
 - [ ] p1-3 用 case designer 设计 `evals/reduce-entropy/` 中 TC-1 至 TC-3 的用例，新增 `npm run eval:reduce-entropy`；**先经用户审核，再实际运行** → TC-1, TC-2, TC-3
 - [ ] p2-1 在一个真实项目上试运行一次（项目由用户之后指定） → TC-5, TC-6, TC-7
@@ -77,7 +77,12 @@ SKILL.md 分“扫描”和“处理”两段，输出熵源清单、每项处�
 - 2026-11-03 gate A passed: requirements as discussed with the user in the planning session. Decided by: user.
 - 2026-11-03 gate B passed: user approved activating and delivering S0005 ("按照这个顺序继续推进"). Decided by: user.
 - 2026-11-03 激活。spec-lint --stage activate 通过，没有 manual TC。Task-ID 暂缺：Task-ID 规则在 S0009，本 spec 按现行 Spec-ID 规则执行。
+- 2026-11-03 p1-1 started。
+- 2026-11-03 p1-1 实现完成：`skills/engineering/reduce-entropy/SKILL.md`，用户触发（`disable-model-invocation: true`）。分扫描、逐项改动、把重复错误变成结构三段；refactor 门槛块逐字内联。参考 pstack refactoring playbook、`correct`、`no-comments`，按本仓库规则改写：不使用子 agent 和模型配置；大改动写成 Task 交回主流程；发现 bug 不修，固定现状并报告。
+- 2026-11-03 p1-1 按当前状态 [~] 提交：TC-4 已通过；TC-1 至 TC-3 依赖 p1-3 的 eval 用例，用例须先经用户审核再运行，所以 p1-1 暂不标 [x]。提交是为了在并行 worktree 中保存可审阅的成果，不表示条目完成；用例运行通过后追加证据并标 [x]。
 
 ## 6. Validation Evidence (append-only)
+
+- 2026-11-03 TC-4 | type: feature | method: command | command: scripts/check-skill-consistency.py; tests/consistency/run.sh; copy skills/ to a temp dir, sed 'Pin before changing code.' to 'Pin when convenient.' in reduce-entropy/SKILL.md, run scripts/check-skill-consistency.py <copy> | exit: 0; 0; 1 | output: "ok: 4 gates in immutable-spec, 8 skills checked"; "consistency mutations: 0 failure(s)"; on the mutated copy "error: skills/engineering/reduce-entropy/SKILL.md: gate 'refactor' differs from immutable-spec" | result: pass | note: 8 skills now includes reduce-entropy, the first real skill that inlines a gate
 
 ## 7. Change Requests (append-only)
