@@ -1,0 +1,14 @@
+{
+  "name": "cauu-skills-evals",
+  "private": true,
+  "description": "Repository-only Agent behavior evaluations for cauu/skills. Not part of any distributed skill.",
+  "engines": {
+    "node": ">=22.22.0"
+  },
+  "scripts": {
+    "eval:immutable-spec": "evals/run.sh immutable-spec"
+  },
+  "devDependencies": {
+    "promptfoo": "0.122.0"
+  }
+}

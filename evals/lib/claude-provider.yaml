@@ -1,0 +1,21 @@
+# Shared agent-under-test definition. Values come from evals/run.sh.
+- id: anthropic:claude-agent-sdk
+  label: claude-agent-sdk / claude-opus-5-5
+  config:
+    apiKeyRequired: false
+    path_to_claude_code_executable: "{{ env.EVAL_CLAUDE_BIN }}"
+    model: claude-opus-5-5
+    working_dir: "{{ env.EVAL_WORKSPACE }}"
+    setting_sources: [project]
+    skills: ["{{ env.EVAL_SKILL }}"]
+    permission_mode: acceptEdits
+    append_allowed_tools: [Write, Edit, Bash]
+    persist_session: false
+    max_turns: 40
+    sandbox:
+      enabled: true
+      failIfUnavailable: true
+      autoAllowBashIfSandboxed: true
+      allowUnsandboxedCommands: false
+      network:
+        allowedDomains: []

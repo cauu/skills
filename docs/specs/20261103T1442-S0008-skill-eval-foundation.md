@@ -86,7 +86,7 @@ provider 配置在 p1-1 中确认：
 ## 3. Execution Plan
 
 - [x] p1-1 小范围试验：确认认证方式、模型名、写权限、只加载项目 skill、关闭网络这五项能否满足；再确认 skills.sh 不会把 `.claude/skills/skill-eval-case-designer` 当作可安装的 skill 列出（会的话改放到其他目录）。结论追加到 Execution Log。任何一项无法满足时停下来，报告给用户
-- [ ] p1-2 `package.json` 固定 Promptfoo 版本；编写 `evals/run.sh`
+- [x] p1-2 `package.json` 固定 Promptfoo 版本；编写 `evals/run.sh`
 - [ ] p1-3 移植 `skill-eval-case-designer` 到 `.claude/skills/`，改成 Claude 和 `evals/<skill>/` 的写法
 - [ ] p1-4 用 case designer 设计 `immutable-spec.no-commit-without-evidence`，人工审核后实际运行
 - [ ] p1-5 编写 `evals/README.md`：运行命令、证据边界、成本
@@ -133,6 +133,12 @@ provider 配置在 p1-1 中确认：
 - 2026-11-03 p1-1 completed：无对应 TC；试验结论记录在上面的日志中。
 - 2026-11-03 更正：头部的 Created Time（16:00）晚于 Start Time（14:42），是起草时写错了。实际创建时间早于 14:42。按只追加规则不修改头部，在此记录。
 
+- 2026-11-03 p1-2 started.
+- 2026-11-03 p1-2 completed: `package.json` pins promptfoo 0.122.0 (engines node>=22.22.0) with `package-lock.json`; `evals/run.sh` checks the suite, the skill, the Node version, promptfoo and `claude`, creates a disposable root, and starts promptfoo under `env -i` with an allowlist; `evals/lib/claude-provider.yaml` holds the shared provider; `evals/lib/hooks.cjs` rebuilds the workspace from `vars.fixture` before each test; `evals/lib/workspace.cjs` provides read-only assertion helpers. `EVAL_SUITE` selects an alternate suite file. `.gitignore` adds `node_modules/`.
+
 ## 6. Validation Evidence (append-only)
+
+- 2026-11-03 TC-1 | stack: node | command: git status --porcelain before and after `npm run eval:immutable-spec`, then diff | result: pass | note: no difference; the agent ran in `$TMPDIR/cauu-skill-eval.*/workspace`
+- 2026-11-03 TC-5 | stack: node | command: HOME=/tmp/s0008-emptyhome evals/run.sh immutable-spec | result: pass | note: provider error "Not logged in · Please run /login", 0 passed / 0 failed / 1 error, exit 100; not reported as a pass
 
 ## 7. Change Requests (append-only)
