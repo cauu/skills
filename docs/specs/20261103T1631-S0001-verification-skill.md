@@ -139,7 +139,7 @@ spec 中引用功能的写法：`method: verify:<feature-id>/<sub-feature>`。
 p1 交付 skill 文本，用静态检查（TC-1、TC-8）验收；skill 的行为由 p1-7 的 eval 用例（TC-9 至 TC-12）和 p2 的试点（TC-2 至 TC-7）验收。全部通过之前本 spec 不关闭。
 
 - [x] p1-1 调研 Claude Code、Codex、Cursor 项目级 skill 的发现路径，确定产物根目录（D1），把决策追加到 Execution Log → TC-8
-- [ ] p1-2 编写 `references/drive-contract.md` → TC-1
+- [x] p1-2 编写 `references/drive-contract.md` → TC-1
 - [ ] p1-3 编写 SKILL.md 的 create → TC-1
 - [ ] p1-4 编写 SKILL.md 的 maintain（局部和全量） → TC-1
 - [ ] p1-5 编写 `references/feature-map-example/`（含 `Source entry points`） → TC-1
@@ -203,8 +203,12 @@ TC-2 至 TC-7 在试点项目上运行，试点项目由用户在 p2 开始前�
 - 2026-11-03 D1 决策：采用方案 B。主体放在 `docs/verification/<app>/`（`README.md` 写 Launch / Doctor / Drive / Evidence / Cleanup / Helpers / Isolation，另有 `drive-contract.md`、`features/`、`scripts/`）；在 `.claude/skills/verify-<app>/SKILL.md` 和 `.agents/skills/verify-<app>/SKILL.md` 各放一个只含 frontmatter 和指向主体的薄包装，项目确定只用其中一种 harness 时只写对应的那个。理由：（1）主体与 harness 无关，满足“不绑定 harness”，也和 `docs/specs/` 的做法一致，人能直接读；（2）两个包装覆盖 Claude Code、Codex、Cursor，内容只有指针，不会出现两份主体漂移；（3）包装就是根目录 agent skill 目录下的 `verify-*` 目录，`spec-lint` 的收尾检测照常生效（TC-8）；（4）maintain 的修改范围清楚：`docs/verification/<app>/` 加两个包装。代价：agent 多读一个文件；Cursor 会看到两个同名包装，内容相同，不影响使用。没有选方案 A（主体放在某个 harness 目录、另一个放符号链接或副本）：符号链接在 Windows 和部分 harness 上不可靠，副本会漂移。决定人：agent，用户可推翻。
 - 2026-11-03 p1-1 completed：新增 `tests/verification/layout.sh`，验证 D1 布局被 `spec-lint` 识别。
 
+- 2026-11-03 p1-2 started。
+- 2026-11-03 p1-2 completed：`skills/engineering/verification/references/drive-contract.md`（Proof、Evidence、Results、Isolation、Control scripts）；新增 `tests/verification/structure.sh`，按部分检查 skill 结构（contract、feature-map、skill、meta，不带参数时全部检查）。各条目先只检查自己交付的部分，p1-6 时跑全量。
+
 ## 6. Validation Evidence (append-only)
 
 - 2026-11-03 TC-8 | type: feature | method: command | command: tests/verification/layout.sh | exit: 0 | output: "ok claude-wrapper-only: update required (exit 1)", "ok agents-wrapper-only: update required (exit 1)", "ok both-wrappers: update required (exit 1)", "ok body-without-wrapper: ok (exit 0)", "verification layout: 0 failure(s)" | result: pass | note: runs the real spec-lint --stage close against temporary repos laid out per D1
+- 2026-11-03 TC-1 | type: feature | method: command | command: tests/verification/structure.sh contract | exit: 0 | output: "ok result words: pass fail inconclusive unreachable", contract mentions .verify-artifacts/<run-id>/<feature-id>/, gitignore, --dry-run, JSON, --help, run-id; "verification structure (contract): 0 failure(s)"; mutation (unreachable -> verified-unreachable) gives "FAIL result words are 'pass fail inconclusive verified-unreachable'" | result: pass | note: contract part only (p1-2); the four words match immutable-spec SKILL.md lines 350-353
 
 ## 7. Change Requests (append-only)
