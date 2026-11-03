@@ -35,7 +35,7 @@ Closure Reason:
 
 ## 3. Execution Plan
 - [x] p1-1 修正关口记录的措辞 → TC-1, TC-2, TC-3
-- [~] p1-2 修正用例 `immutable-spec.closure-requires-verify-update` 的 fixture 与断言 → TC-2
+- [x] p1-2 修正用例 `immutable-spec.closure-requires-verify-update` 的 fixture 与断言 → TC-2
 
 ## 4. Test and Acceptance Criteria
 - TC-1 `immutable-spec.gate-log` 修复前可复现失败；修复后连续 5 次运行全部通过

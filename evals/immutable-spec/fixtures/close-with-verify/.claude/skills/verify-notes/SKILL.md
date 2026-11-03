@@ -6,4 +6,4 @@ description: Drive the Notes command-line app the way a user does and capture ev
 # Verify Notes
 
 ## Features
-- `export/csv`: run `node bin/notes.js export`; the output starts with `title,body` and has one line per note in `data/notes.json`.
+- `cli/usage`: run `node bin/notes.js` with no command; it prints `usage: notes export` to stderr and exits 2.
