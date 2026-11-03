@@ -142,7 +142,7 @@ p1 交付 skill 文本，用静态检查（TC-1、TC-8）验收；skill 的行�
 - [x] p1-2 编写 `references/drive-contract.md` → TC-1
 - [ ] p1-3 编写 SKILL.md 的 create → TC-1
 - [ ] p1-4 编写 SKILL.md 的 maintain（局部和全量） → TC-1
-- [ ] p1-5 编写 `references/feature-map-example/`（含 `Source entry points`） → TC-1
+- [x] p1-5 编写 `references/feature-map-example/`（含 `Source entry points`） → TC-1
 - [ ] p1-6 补充 `agents/openai.yaml`，更新 README（工作流概览由用户维护，本 spec 不修改） → TC-1
 - [ ] p1-7 用 case designer 设计 `evals/verification/` 用例，先不调用 agent 验证用例本身，经用户审核后再实际运行 → TC-9, TC-10, TC-11, TC-12
 - [ ] p2-1 试点 A：在一个 Web 或 CLI 项目上运行 create（项目待定） → TC-2, TC-3, TC-4
@@ -206,9 +206,14 @@ TC-2 至 TC-7 在试点项目上运行，试点项目由用户在 p2 开始前�
 - 2026-11-03 p1-2 started。
 - 2026-11-03 p1-2 completed：`skills/engineering/verification/references/drive-contract.md`（Proof、Evidence、Results、Isolation、Control scripts）；新增 `tests/verification/structure.sh`，按部分检查 skill 结构（contract、feature-map、skill、meta，不带参数时全部检查）。各条目先只检查自己交付的部分，p1-6 时跑全量。
 
+- 2026-11-03 p1-5 started（先于 p1-3：SKILL.md 要链接到这个示例）。
+
+- 2026-11-03 p1-5 completed：`references/feature-map-example/`：README（前置条件、驱动约定、报告方式、功能文件约定、索引）和两个功能文件 `create-note.md`（浏览器与 CLI）、`export.md`（CLI，含 dry-run），各有五个固定二级标题，最后一个是 `Source entry points`。示例按 D1 写，命令走生成工具的 `scripts/verify`。
+
 ## 6. Validation Evidence (append-only)
 
 - 2026-11-03 TC-8 | type: feature | method: command | command: tests/verification/layout.sh | exit: 0 | output: "ok claude-wrapper-only: update required (exit 1)", "ok agents-wrapper-only: update required (exit 1)", "ok both-wrappers: update required (exit 1)", "ok body-without-wrapper: ok (exit 0)", "verification layout: 0 failure(s)" | result: pass | note: runs the real spec-lint --stage close against temporary repos laid out per D1
 - 2026-11-03 TC-1 | type: feature | method: command | command: tests/verification/structure.sh contract | exit: 0 | output: "ok result words: pass fail inconclusive unreachable", contract mentions .verify-artifacts/<run-id>/<feature-id>/, gitignore, --dry-run, JSON, --help, run-id; "verification structure (contract): 0 failure(s)"; mutation (unreachable -> verified-unreachable) gives "FAIL result words are 'pass fail inconclusive verified-unreachable'" | result: pass | note: contract part only (p1-2); the four words match immutable-spec SKILL.md lines 350-353
+- 2026-11-03 TC-1 | type: feature | method: command | command: tests/verification/structure.sh feature-map | exit: 0 | output: "ok five H2s in order" for create-note.md and export.md, "ok indexed" for both, "ok 2 feature files", "verification structure (feature-map): 0 failure(s)"; mutation (Source entry points -> Source files) gives "FAIL H2s in .../export.md" | result: pass | note: feature-map part only (p1-5)
 
 ## 7. Change Requests (append-only)
