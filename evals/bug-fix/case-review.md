@@ -2,11 +2,11 @@
 
 This file is repository evaluation source and is not installed with the skill.
 
-Status: designed for S0003 (TC-2, TC-3, TC-4, TC-7), validated without an agent, **not yet approved and not yet run**. Run with `npm run eval:bug-fix` only after approval.
+Status: designed for S0003 (TC-2, TC-3, TC-4, TC-7), validated without an agent, approved by the user on 2026-11-03 ("按建议"), including every judgment below and the optional `withSkills` var in `evals/lib/hooks.cjs`. Run with `npm run eval:bug-fix`.
 
 All cases name the skill in the task, so they prove application of the skill, not automatic routing to it (the skill is model-invoked, so routing is a real gap; see Known omissions). Each runs once and requires 100%. All assertions are deterministic. No LLM judge is used.
 
-## Added for S0003 (pending review)
+## Added for S0003 (approved)
 
 | caseId | TC | Fixture | Task (after naming the skill) | Pass requires | Rejected outcomes |
 |---|---|---|---|---|---|
@@ -49,3 +49,18 @@ All cases name the skill in the task, so they prove application of the skill, no
 ## Cost of one full suite run
 
 Not measured. The existing suites report 0.18 to 0.69 USD per case list-price equivalent with `claude-opus-5-5` (see `evals/README.md`), so expect roughly 0.6 to 2 USD for these three.
+
+## Runs (2026-11-03)
+
+- First full run after approval (`cauu-skill-eval.1c4ibf`): 3 of 3 passed in 4 min 11 s. Reported cost 0.26, 0.23 and 0.31 USD (about 0.80 USD for the suite, list-price equivalent).
+  - `unreproducible-stops`: "I couldn't reproduce T-31, so I haven't fixed anything." The agent tried 5 notes, 1,200 notes, tricky titles, a pipe, and 100,000 notes. It also offered an unconfirmed guess (file order versus date order) without acting on it.
+  - `simple-red-before-fix`: the failing CLI test was committed first, then the one-line fix at `src/paging.js:10`. The task records `page 2 of 3 (2 shown)` before and `(3 shown)` after. The complexity call was "Simple".
+  - `complex-lite-spec`: `Total 2026-10: 126.51 (5 expenses)` was recorded verbatim, with the root cause at `src/store.js:8`. The call was "Complexity: complex", decided by "data is involved". Nothing was fixed or committed, and the agent asked for gate A. It also said the user could reasonably downgrade the bug to simple, because the code change is one line.
+- Shared-hook regression check:
+  - `npm run eval:tdd`: 1 of 1 passed.
+  - `npm run eval:immutable-spec`: 6 of 7 passed. `immutable-spec.gate-log` failed on `gateBReturnedLogged` alone, and failed again the same way when rerun alone (`cauu-skill-eval.VfOACJ`). The agent logged gate A as passed but wrote "Gate B pending" instead of a `gate B returned` line.
+  - Not caused by the hook: building all 19 fixtures of the immutable-spec, tdd, spec-design, challenge and code-review suites with the old hook (`d1a5418`) and the new one gives byte-identical workspaces. The immutable-spec skill and its eval sources have not changed since S0002 recorded this case as passing. This is left open for the user; it is outside S0003.
+
+## Changed after approval
+
+- None. No case, fixture, or assertion was changed.
