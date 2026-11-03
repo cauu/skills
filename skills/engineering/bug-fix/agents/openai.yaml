@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bug Fix"
+  short_description: "Reproduce first, fix with evidence, verify on the same entry point"
+  default_prompt: "Use $bug-fix to reproduce this bug from my claimed task, find its root cause, and fix it with the failing check committed before the fix."

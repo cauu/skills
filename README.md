@@ -79,6 +79,12 @@ workflow, see
 
 ### Model-invoked
 
+- **[bug-fix](./skills/engineering/bug-fix/SKILL.md)** — Fix a bug from a
+  claimed task, reproduction first: reproduce read-only on the reported entry
+  point and stop when it does not reproduce, locate the root cause with run
+  evidence, then fix a simple bug with the failing check committed before the
+  fix, or route a complex one to a lite spec and a user gate. Works without
+  other skills.
 - **[challenge](./skills/engineering/challenge/SKILL.md)** — Review a proposed
   solution from an adversarial perspective: challenge the problem, unnecessary
   complexity, inherited constraints, assumptions, and acceptance criteria.
@@ -106,6 +112,7 @@ workflow, see
 ```text
 skills/
 └── engineering/
+    ├── bug-fix/
     ├── challenge/
     ├── code-review/
     ├── codebase-design/
