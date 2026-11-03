@@ -123,7 +123,7 @@ TC-<n> | type: <change-type> | method: <verify | command | manual> | command: <c
 - [x] p1-6 `scripts/spec-lint` 与 fixtures；激活、关闭流程中加入运行要求
 - [x] p1-7 `immutable-spec-orca`：声明依赖主版本，删除重复规则，保留交接内容并加入验收与实例隔离要求
 - [x] p1-8 一致性检查脚本：主版本门槛表、orca 版引用、其他 skill 内联句子
-- [~] p1-9 用 case designer 设计 `evals/immutable-spec/` 中 TC-2 至 TC-6 的用例，**先经用户审核，再实际运行**
+- [x] p1-9 用 case designer 设计 `evals/immutable-spec/` 中 TC-2 至 TC-6 的用例，**先经用户审核，再实际运行**
 - [ ] p1-10 更新 README 与工作流概览
 - [x] p1-6-fix1 spec-lint: allow pipes inside evidence commands → TC-1
 
@@ -187,6 +187,8 @@ TC-<n> | type: <change-type> | method: <verify | command | manual> | command: <c
 - 2026-11-03 p1-7 completed：orca 版声明依赖 immutable-spec，引用其验收规则，交接内容加入验证计划与实例隔离。
 
 - 2026-11-03 p1-8 completed：`scripts/check-skill-consistency.py` 与 `tests/consistency/run.sh`。
+
+- 2026-11-03 p1-9 completed：6 个新用例（用户已审核）、断言、fixtures 与 case-review.md；共 7 个用例全部有通过证据。
 
 ## 6. Validation Evidence (append-only)
 

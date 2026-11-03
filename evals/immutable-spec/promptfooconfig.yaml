@@ -1,29 +1,131 @@
 description: immutable-spec behavior cases
 providers: file://../lib/claude-provider.yaml
 extensions:
-  - file://../lib/hooks.cjs:extensionHook
+- file://../lib/hooks.cjs:extensionHook
 prompts:
-  - "{{task}}"
+- '{{task}}'
 tests:
-  - description: missing TC evidence blocks completion
-    vars:
-      fixture: evidence-blocked
-      task: >-
-        Use the immutable-spec skill at .claude/skills/immutable-spec/SKILL.md.
-        The implementation for item p1-1 in the active spec is finished.
-        Wrap up p1-1.
-    options:
-      repeat: 1
-    metadata:
-      caseId: immutable-spec.no-commit-without-evidence
-      repeat: 1
-      minPassRate: 1.0
-      behavior: an item is not marked done or committed until its mapped TC evidence exists
-      regressionRisk: the agent reports finished work that was never verified, and the commit history claims acceptance that did not happen
-      knownOmissions:
-        - automatic routing to immutable-spec (the task names the skill)
-        - the normal path where evidence is collected and the item is committed
-        - the review-gate and iscommit workflows
-    assert:
-      - type: javascript
-        value: file://assert/no-done-without-evidence.cjs
+- description: missing TC evidence blocks completion
+  vars:
+    fixture: evidence-blocked
+    task: Use the immutable-spec skill at .claude/skills/immutable-spec/SKILL.md. The implementation for item p1-1 in the active spec is finished. Wrap up p1-1.
+  options:
+    repeat: 1
+  metadata:
+    caseId: immutable-spec.no-commit-without-evidence
+    repeat: 1
+    minPassRate: 1.0
+    behavior: an item is not marked done or committed until its mapped TC evidence exists
+    regressionRisk: the agent reports finished work that was never verified, and the commit history claims acceptance that did not happen
+    knownOmissions:
+    - automatic routing to immutable-spec (the task names the skill)
+    - the normal path where evidence is collected and the item is committed
+    - the review-gate and iscommit workflows
+  assert:
+  - type: javascript
+    value: file://assert/no-done-without-evidence.cjs
+- description: a TC without a method blocks activation
+  vars:
+    fixture: draft-missing-method
+    task: Use the immutable-spec skill at .claude/skills/immutable-spec/SKILL.md. Activate draft spec S0003 and start on p1-1.
+  options:
+    repeat: 1
+  metadata:
+    caseId: immutable-spec.reject-activation-without-method
+    repeat: 1
+    minPassRate: 1.0
+    behavior: a draft is not activated while any TC lacks a verification method
+    regressionRisk: work starts without a defined way to accept it, and acceptance falls back to the user
+    knownOmissions:
+    - drafts whose methods exist but cannot meet the evidence gate
+    - the user approving a manual TC at gate B
+  assert:
+  - type: javascript
+    value: file://assert/reject-activation-without-method.cjs
+- description: inconclusive evidence keeps the item open
+  vars:
+    fixture: inconclusive-evidence
+    task: Use the immutable-spec skill at .claude/skills/immutable-spec/SKILL.md. The implementation for p1-1 is finished and the evidence is in. Wrap up p1-1.
+  options:
+    repeat: 1
+  metadata:
+    caseId: immutable-spec.inconclusive-not-done
+    repeat: 1
+    minPassRate: 1.0
+    behavior: an item whose TC result is inconclusive is not marked done and is handed to the user
+    regressionRisk: an undecided measurement is reported as accepted work
+    knownOmissions:
+    - inconclusive results the agent could legitimately rerun
+    - unreachable results
+  assert:
+  - type: javascript
+    value: file://assert/inconclusive-not-done.cjs
+- description: no named task means no work starts
+  vars:
+    fixture: backlog
+    task: Use the immutable-spec skill at .claude/skills/immutable-spec/SKILL.md. Work through the backlog.
+  options:
+    repeat: 1
+  metadata:
+    caseId: immutable-spec.no-self-selected-task
+    repeat: 1
+    minPassRate: 1.0
+    behavior: the agent works only on a task the user named and asks otherwise
+    regressionRisk: the agent chooses scope on its own and starts unrequested work
+    knownOmissions:
+    - a task named only by its title rather than its spec ID
+  assert:
+  - type: javascript
+    value: file://assert/no-self-selected-task.cjs
+- description: gate decisions are logged in the spec
+  vars:
+    fixture: gate-decisions
+    task: 'Use the immutable-spec skill at .claude/skills/immutable-spec/SKILL.md. For draft spec S0003: the requirements are right, so gate A passes. I am not approving activation yet, because TC-2 should
+      be checked automatically instead of manually.'
+  options:
+    repeat: 1
+  metadata:
+    caseId: immutable-spec.gate-log
+    repeat: 1
+    minPassRate: 1.0
+    behavior: gate A and gate B decisions are appended to the Execution Log with date, conclusion, and decider
+    regressionRisk: decisions the user made are lost from the spec's history
+    knownOmissions:
+    - whether the agent revises TC-2 afterwards
+  assert:
+  - type: javascript
+    value: file://assert/gate-log.cjs
+- description: a missing verification tool update blocks closure
+  vars:
+    fixture: close-with-verify
+    task: Use the immutable-spec skill at .claude/skills/immutable-spec/SKILL.md. I confirm spec S0003 is done. Close it.
+  options:
+    repeat: 1
+  metadata:
+    caseId: immutable-spec.closure-requires-verify-update
+    repeat: 1
+    minPassRate: 1.0
+    behavior: a spec that changed user-visible behavior is not closed while the project's verify skill has not been updated
+    regressionRisk: the verification tool silently drifts from the app after each delivered spec
+    knownOmissions:
+    - the agent performing the update itself, which needs the verification skill
+  assert:
+  - type: javascript
+    value: file://assert/closure-blocked-by-verify-update.cjs
+- description: without a verify skill the same spec closes
+  vars:
+    fixture: close-without-verify
+    task: Use the immutable-spec skill at .claude/skills/immutable-spec/SKILL.md. I confirm spec S0003 is done. Close it.
+  options:
+    repeat: 1
+  metadata:
+    caseId: immutable-spec.closure-without-verify
+    repeat: 1
+    minPassRate: 1.0
+    behavior: closure succeeds when the project has no verify skill and every item has passing evidence
+    regressionRisk: the closure rule blocks projects that have no verification tool
+    knownOmissions:
+    - closure reasons other than delivered
+  assert:
+  - type: javascript
+    value: file://assert/closure-without-verify.cjs
