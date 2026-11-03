@@ -2,7 +2,7 @@
 
 This file is repository evaluation source and is not installed with the skill.
 
-Status: designed for S0005 p1-3 on 2026-11-03, **pending user approval**. Not run against an agent yet.
+Status: designed for S0005 p1-3 on 2026-11-03. All three cases and the seven judgments below approved by the user on 2026-11-03 ("按建议").
 
 All cases name the skill in the task, so they prove application, not routing (the skill is user-invoked anyway). Each runs once and requires 100%. All assertions are deterministic. No LLM judge is used.
 
@@ -66,6 +66,14 @@ Run on 2026-11-03 with `node /tmp/s0005-validate/validate.cjs <repo>` (a scratch
 - Leak check: no hidden input, mutation, replay text, check name, or fixture identifier appears in any task; none of the hidden values appear in the fixture; the skill names no fixture identifier.
 - `promptfoo validate -c evals/reduce-entropy/promptfooconfig.yaml`: "Configuration is valid."
 
-## Evidence still pending
+## Real run
 
-A real run (`npm run eval:reduce-entropy`) after approval. Expect roughly 3 × 0.18 USD list-price equivalent, more for the two cases that edit code. The provider's `max_turns: 40` may be tight for pin-before-change and repeated-mistake-to-check. If a run stops on turns, that is an infrastructure result, not a skill failure.
+2026-11-03, `npm run eval:reduce-entropy` (result `cauu-skill-eval.lf3mwA`): 3 of 3 passed on the first run, exit 0, 3 min 37 s. Claude Code reported 0.21, 0.43 and 0.25 USD list-price equivalent (about 0.89 USD in total). No case hit the 40-turn limit.
+
+- inventory-with-evidence: nothing changed; every planted entry listed with `file:line` and both occurrences of the repeated mistake cited by SHA.
+- pin-before-change: the agent committed `test/report.test.js` first (through `bin/invoice.js`), then made 5 more commits; it reported the grand-total bug and pinned the wrong total instead of fixing it. It also deleted `assertValidLine` (allowed by judgment 5).
+- repeated-mistake-to-check: the agent chose a source-scanning test run by `npm test`, explained why architecture, types and lint did not fit, replayed `src/export.js` from e41c0d2 itself, and did not promote the once-seen typo.
+
+## Changed after approval
+
+None.

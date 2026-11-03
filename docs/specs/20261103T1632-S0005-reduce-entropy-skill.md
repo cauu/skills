@@ -45,7 +45,7 @@ SKILL.md 分“扫描”和“处理”两段，输出熵源清单、每项处�
 
 - [~] p1-1 编写 SKILL.md（内联 refactor 门槛） → TC-1, TC-2, TC-3, TC-4
 - [x] p1-2 补充 `agents/openai.yaml`，更新 README → none (reason: 元数据和文档，不改变 agent 行为)
-- [~] p1-3 用 case designer 设计 `evals/reduce-entropy/` 中 TC-1 至 TC-3 的用例，新增 `npm run eval:reduce-entropy`；**先经用户审核，再实际运行** → TC-1, TC-2, TC-3
+- [x] p1-3 用 case designer 设计 `evals/reduce-entropy/` 中 TC-1 至 TC-3 的用例，新增 `npm run eval:reduce-entropy`；**先经用户审核，再实际运行** → TC-1, TC-2, TC-3
 - [ ] p2-1 在一个真实项目上试运行一次（项目由用户之后指定） → TC-5, TC-6, TC-7
 
 ## 4. Test and Acceptance Criteria
@@ -84,9 +84,15 @@ SKILL.md 分“扫描”和“处理”两段，输出熵源清单、每项处�
 - 2026-11-03 p1-3 started。
 - 2026-11-03 p1-3 用例设计完成：`evals/reduce-entropy/` 新增 3 个用例（`inventory-with-evidence`、`pin-before-change`、`repeated-mistake-to-check`），共用 fixture `invoice-cli`；`package.json` 新增 `eval:reduce-entropy`。eval hook 只做一次提交，历史改为 fixture 中导出的 `docs/git-log.txt` 和 `docs/review-notes.md`，理由见 case-review.md。不调用 agent 的检查已完成：fixture 检查、18 个模拟结果（3 个正确、15 个错误）全部按预期判定、泄漏检查、`promptfoo validate`。检查中发现并修正一处断言弱点（变异点从 pricing.js 移到包装层调用处）。等待用户审核，审核通过后再实际运行；未运行 `evals/run.sh`。
 - 2026-11-03 p1-3 按当前状态 [~] 提交，理由同 p1-1：TC-1 至 TC-3 要等用例审核和实际运行。
+- 2026-11-03 p1-3 用例审核：用户批准 reduce-entropy 的全部用例及 case-review 中列出的判断；接受 p1-1、p1-3 在进行中状态下提交。决定人：用户。
+- 2026-11-03 第一次全量运行（`npm run eval:reduce-entropy`，Node 24.12.0）：3 个用例全部通过，退出码 0，耗时 3 分 37 秒，Claude Code 报告标价折算约 0.89 USD（0.21 + 0.43 + 0.25）。没有用例失败，skill 和用例都未修改；没有触到 40 轮上限。
+- 2026-11-03 p1-3 completed：3 个用例（用户已审核）、断言、fixture 与 case-review.md；TC-1 至 TC-3 有通过证据。
 
 ## 6. Validation Evidence (append-only)
 
 - 2026-11-03 TC-4 | type: feature | method: command | command: scripts/check-skill-consistency.py; tests/consistency/run.sh; copy skills/ to a temp dir, sed 'Pin before changing code.' to 'Pin when convenient.' in reduce-entropy/SKILL.md, run scripts/check-skill-consistency.py <copy> | exit: 0; 0; 1 | output: "ok: 4 gates in immutable-spec, 8 skills checked"; "consistency mutations: 0 failure(s)"; on the mutated copy "error: skills/engineering/reduce-entropy/SKILL.md: gate 'refactor' differs from immutable-spec" | result: pass | note: 8 skills now includes reduce-entropy, the first real skill that inlines a gate
+- 2026-11-03 TC-1 | type: feature | method: command | command: npm run eval:reduce-entropy | exit: 0 | output: reduce-entropy.inventory-with-evidence pass; checks {workspaceUnchanged, noNewCommit, namesDeadCode, namesWrapper, namesRedundantValidator, givesFileLocation, citesFirstOccurrence, citesSecondOccurrence} all true; "I didn't change anything." inventory rows: repeated mistake "introduced in 91b2e6a, fixed in a3f9c21 ... e41c0d2 ... fixed in 7be0d44", "`src/report.js:19-21` `formatRowLegacy`", "`getLineTotal` ... collapse", "`assertValidLine` ... Repeats the checks in `src/orders.js:11-16`" | result: pass | note: suite run 2026-11-03 (cauu-skill-eval.lf3mwA), first run after approval, 3/3 passed
+- 2026-11-03 TC-2 | type: feature | method: command | command: npm run eval:reduce-entropy | exit: 0 | output: reduce-entropy.pin-before-change pass; checks {wrapperGone, deadCodeGone, behaviorUnchanged, pinAdded, pinPassesOnOriginal, pinPassesOnResult, pinCatchesChangeAtWrapperCall, committed} all true; "Before touching the code I added `test/report.test.js` (commit cd37716) ... It passed on the original code, and the same unedited test passed after every commit"; "I found a bug and left it alone. The `TOTAL` line skips the first order" | result: pass | note: suite run 2026-11-03 (cauu-skill-eval.lf3mwA); 6 commits on branch reduce-entropy/report
+- 2026-11-03 TC-3 | type: feature | method: command | command: npm run eval:reduce-entropy | exit: 0 | output: reduce-entropy.repeated-mistake-to-check pass; checks {checksPassOnResult, replayedMistakeFails, failureNamesFix, citesFirstOccurrence, citesSecondOccurrence} all true; agent added test/no-utc-day.test.js run by npm test; "I put back the `src/export.js` from `e41c0d2` and ran `npm test`. It failed with 'toISOString() gives the UTC day, not the local one. Use formatLocalDate from src/dates.js instead:'"; once-seen typo 5d18b7e "doesn't count as a repeat" | result: pass | note: suite run 2026-11-03 (cauu-skill-eval.lf3mwA)
 
 ## 7. Change Requests (append-only)
