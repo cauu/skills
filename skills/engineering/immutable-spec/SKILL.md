@@ -188,8 +188,10 @@ Map every Execution Plan item to its TCs with `→ TC-1, TC-2`, or `→ none (re
 
 Two user decisions are recorded in the spec, each as one appended Execution Log line:
 
-- Gate A, requirements confirmed: `- <date> gate A passed|returned: <conclusion>. Decided by: <user>.`
-- Gate B, activation approved: `- <date> gate B passed|returned: <conclusion>. Decided by: <user>.`
+- Gate A, requirements decision: `- <date> gate A passed|returned: <conclusion>. Decided by: <user>.`
+- Gate B, activation decision: `- <date> gate B passed|returned: <conclusion>. Decided by: <user>.`
+
+Approval is `passed`. A refusal, a postponement, or "not approving yet" is also a gate decision: record it as `returned` with the user's reason. Record every gate decision the user makes, in the same turn.
 
 Only work on a task the user named. Never pick work from a backlog yourself.
 
