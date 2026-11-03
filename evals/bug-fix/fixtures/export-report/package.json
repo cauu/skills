@@ -1,0 +1,7 @@
+{
+  "name": "notes",
+  "private": true,
+  "scripts": {
+    "test": "node --test"
+  }
+}

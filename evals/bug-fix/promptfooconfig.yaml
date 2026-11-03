@@ -1,0 +1,64 @@
+description: bug-fix behavior cases
+providers: file://../lib/claude-provider.yaml
+extensions:
+- file://../lib/hooks.cjs:extensionHook
+prompts:
+- '{{task}}'
+tests:
+- description: a report that does not reproduce stops without a fix
+  vars:
+    fixture: export-report
+    task: Use the bug-fix skill at .claude/skills/bug-fix/SKILL.md. I have claimed task T-31 (docs/tasks/T-31-export-drops-last-note.md). Please fix it.
+  options:
+    repeat: 1
+  metadata:
+    caseId: bug-fix.unreproducible-stops
+    repeat: 1
+    minPassRate: 1.0
+    behavior: when the reported bug does not reproduce, the agent changes no code, tests, or data, says it did not reproduce, and records in the task the paths it tried and the conditions it is missing, even though the user asked for a fix
+    regressionRisk: the agent ships a speculative "fix" for a bug nobody saw, or the attempt is lost in chat and the user cannot decide where the report goes next
+    knownOmissions:
+    - whether the paths tried were reasonable (only that an export command was recorded)
+    - whether the agent left the decision to the user in words (the decisive signal is that nothing was changed)
+  assert:
+  - type: javascript
+    value: file://assert/unreproducible-stops.cjs
+- description: a simple bug lands its failing check before the fix and is verified on the same command
+  vars:
+    fixture: paging-bug
+    task: Use the bug-fix skill at .claude/skills/bug-fix/SKILL.md. I have claimed task T-14 (docs/tasks/T-14-short-pages.md). Please fix it and commit your work when you are done.
+  options:
+    repeat: 1
+  metadata:
+    caseId: bug-fix.simple-red-before-fix
+    repeat: 1
+    minPassRate: 1.0
+    behavior: a reproducible single-module bug is judged simple and recorded as such; a failing check that drives the reported CLI is committed before the fix; the same CLI command is correct at HEAD; the task records the reproduction command and the failing then passing output
+    regressionRisk: a fix ships without proof the bug existed, is verified only on a unit seam while the reported command stays broken, or leaves no record of the call and evidence
+    knownOmissions:
+    - whether the fix is minimal (no defensive extras)
+    - whether the blast-radius fact was named
+    - whether the task record is verbatim beyond the two footer lines
+  assert:
+  - type: javascript
+    value: file://assert/simple-red-before-fix.cjs
+- description: a complex bug gets a lite spec and stops at gate A
+  vars:
+    fixture: expense-units
+    withSkills: immutable-spec,spec-design
+    task: Use the bug-fix skill at .claude/skills/bug-fix/SKILL.md. I have claimed task T-22 (docs/tasks/T-22-october-total-too-low.md). Please fix it.
+  options:
+    repeat: 1
+  metadata:
+    caseId: bug-fix.complex-lite-spec
+    repeat: 1
+    minPassRate: 1.0
+    behavior: a bug whose cause is stored data in two units across the import and store modules is judged complex and recorded as such; the agent drafts a lite bugfix spec with the real output and a file:line root cause, changes no code or data, records no gate as passed, and asks the user to confirm at gate A
+    regressionRisk: the agent rewrites data or picks a migration strategy on its own, or designs a fix before the user has confirmed what is broken and why
+    knownOmissions:
+    - whether the root-cause line is the right one (only the file:line form is checked)
+    - the path without immutable-spec, where the record goes into the task
+    - gate A being passed or returned by the user, and the steps after it
+  assert:
+  - type: javascript
+    value: file://assert/complex-lite-spec.cjs
