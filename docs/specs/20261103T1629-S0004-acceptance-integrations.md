@@ -57,7 +57,7 @@ S0002 定义了通过标准和自主验收规则。`challenge`、`tdd`、`code-r
 
 - [x] p1-1 `challenge`：原型优先、逐条检查验收标准能否由 agent 验证 → TC-5
 - [x] p1-2 `tdd`：修 bug 先复现，失败用例先于修复 → TC-6
-- [ ] p1-3 `code-review`：P0/P1 尝试复现，标注 `证据支持（已复现）` 或列出尝试路径 → TC-7
+- [x] p1-3 `code-review`：P0/P1 尝试复现，标注 `证据支持（已复现）` 或列出尝试路径 → TC-7
 - [ ] p1-4 用 case designer 设计 `evals/challenge/`、`evals/tdd/`、`evals/code-review/` 的用例和 `package.json` 脚本，**先经用户审核，再实际运行** → TC-1, TC-2, TC-3, TC-4, TC-8
 
 ## 4. Test and Acceptance Criteria
@@ -96,10 +96,13 @@ S0002 定义了通过标准和自主验收规则。`challenge`、`tdd`、`code-r
 - 2026-11-03 p1-1 completed：`challenge/SKILL.md` 新增两段规则（Prototype what can be run；Check every acceptance criterion，可选使用项目的 `verify-<app>`），Required Output 新增 `## Acceptance Criteria Check`，Challenge 与 Missing Acceptance Criteria 的模板行补上“要运行什么”。行为验收在 p1-4（TC-1、TC-2）。
 - 2026-11-03 p1-2 started.
 - 2026-11-03 p1-2 completed：`tdd/SKILL.md` 的 Rules of the loop 新增 “Bugs: reproduce first”：第一个 red 是报告问题入口处的测试，先看到它因报告的原因失败再修；提交时失败用例单独提交且先于修复；无法让它失败就停下并报告尝试过的路径。行为验收在 p1-4（TC-3）。
+- 2026-11-03 p1-3 started.
+- 2026-11-03 p1-3 completed：`code-review/SKILL.md` 复核步骤新增第 2 步（对读码后成立的每个 P0/P1 尝试实际复现，有项目根目录的 `verify-<app>` 时优先用，复现文件只放 `tmp/review/<feature>/`，不改产品代码）；`证据状态` 新增 `证据支持（已复现）` 并要求 `复现:` 命令和输出摘录，未复现的记录 `复现尝试:`（按 immutable-spec 的 inconclusive / unreachable 区分）；Scope Resolution 中“不读其他 skill”加上 verify-<app> 的可选例外；Guardrails 加复现只读要求；最终汇报加已复现数；summary 模板同步。Orchestration Workflow（三 reviewer 结构）未改。行为验收在 p1-4（TC-4）。
 
 ## 6. Validation Evidence (append-only)
 
 - 2026-11-03 TC-5 | type: feature | method: command | command: grep -nE "prototype|Acceptance Criteria Check" skills/engineering/challenge/SKILL.md; grep -n "](\.\./" skills/engineering/challenge/SKILL.md; scripts/check-skill-consistency.py | exit: 0 / 1 (no match) / 0 | output: "20:**Prototype what can be run.** When a question can be answered by running something (behavior, timing, layout, performance), do not settle it on paper."; "47:## Acceptance Criteria Check"; link grep printed nothing; "ok: 4 gates in immutable-spec, 7 skills checked" | result: pass | note: text layer only; agent behavior is TC-1 and TC-2
 - 2026-11-03 TC-6 | type: feature | method: command | command: grep -nE "reproduce|failing test" skills/engineering/tdd/SKILL.md; grep -n "](\.\./" skills/engineering/tdd/SKILL.md; scripts/check-skill-consistency.py | exit: 0 / 1 (no match) / 0 | output: "38:- **Bugs: reproduce first.** For a bug, the first red is a test at the entry point where the bug was reported. ... the failing test lands in its own commit before the fix, so the history shows red, then green. If you cannot make it fail, stop and report the paths you tried"; link grep printed nothing; "ok: 4 gates in immutable-spec, 7 skills checked" | result: pass | note: text layer only; agent behavior is TC-3
+- 2026-11-03 TC-7 | type: feature | method: command | command: grep -n "已复现\|复现尝试" skills/engineering/code-review/SKILL.md skills/engineering/code-review/references/templates/summary-template.md; cmp of the "## Orchestration Workflow" section before (git show HEAD) and after; grep -rn "](\.\./" skills/engineering/code-review; scripts/check-skill-consistency.py | exit: 0 / 0 / 1 (no match) / 0 | output: "SKILL.md:212:4. Give each retained finding a `证据状态:` verdict — `证据支持（已复现）` (a run"; "SKILL.md:217: code-reading verdict and records `复现尝试:`"; "summary-template.md:23: ... `证据状态: 证据支持（已复现）`"; "summary-template.md:31:  - 复现尝试: ..."; "workflow cmp exit=0 lines=85"; link grep printed nothing; "ok: 4 gates in immutable-spec, 7 skills checked" | result: pass | note: text layer only; agent behavior is TC-4
 
 ## 7. Change Requests (append-only)
