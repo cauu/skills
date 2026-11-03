@@ -70,6 +70,12 @@ workflow, see
   resolved code-change scope using three isolated reviewer executions, verify
   candidate findings against the code, and produce an advisory checklist for
   human confirmation.
+- **[reduce-entropy](./skills/engineering/reduce-entropy/SKILL.md)** — Periodic
+  cleanup: list repeated mistakes, dead code, one-caller wrappers, redundant
+  validators, and comments that restate code with evidence; pin behavior before
+  each change, delete before adding, revert what does not lower reader load,
+  and turn each mistake that happened twice into the highest-level check that
+  catches it.
 
 ### Model-invoked
 
@@ -106,6 +112,7 @@ skills/
     ├── codebase-map/
     ├── immutable-spec/
     ├── immutable-spec-orca/
+    ├── reduce-entropy/
     └── tdd/
 ```
 

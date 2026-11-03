@@ -1,0 +1,6 @@
+interface:
+  display_name: "Reduce Entropy"
+  short_description: "Periodic cleanup that pins behavior and turns repeated mistakes into checks"
+  default_prompt: "Use $reduce-entropy to clean up this repository."
+policy:
+  allow_implicit_invocation: false
