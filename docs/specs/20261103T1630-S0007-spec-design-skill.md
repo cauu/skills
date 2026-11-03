@@ -77,7 +77,7 @@ pstack 有技术设计能力（`architect`、`arena`、Prototype playbook、mult
 ## 3. Execution Plan
 
 - [ ] p1-1 编写 SKILL.md（完整流程、简化版、跳过条件、内联证据门槛） → TC-1, TC-8
-- [ ] p1-2 编写 `references/design-red-flags.md`，与 `codebase-design` 对齐 → TC-10
+- [x] p1-2 编写 `references/design-red-flags.md`，与 `codebase-design` 对齐 → TC-10
 - [ ] p1-3 编写 `references/rationale-template.md`、`references/decision-brief.md` → TC-11
 - [ ] p1-4 `immutable-spec-orca` 第 3 步改为指向本 skill（可选读取） → TC-9
 - [ ] p1-5 补充 `agents/openai.yaml`，更新 README（工作流概览 `docs/ai-engineering-workflow-overview.md` 未纳入版本控制，本 spec 不改） → TC-12
@@ -128,7 +128,10 @@ pstack 有技术设计能力（`architect`、`arena`、Prototype playbook、mult
 - 2026-11-03 gate A passed: requirements as discussed with the user in the planning session. Decided by: user.
 - 2026-11-03 gate B passed: user approved activating and delivering S0007 ("按照这个顺序继续推进"). Decided by: user.
 - 2026-11-03 激活。无 manual TC。spec-lint --stage activate: ok。Task-ID 暂缺：Task-ID 规则在 S0009，本 spec 按现行 Spec-ID 规则执行。
+- 2026-11-03 p1-2 completed：`references/design-red-flags.md` 取 pstack architect 的清单（浅模块、信息泄漏、时间顺序分解、透传方法、所有权分裂、一件事两种做法、内部可导入、手工同步的列表），另加“调用方必须懂内部规则”“只有一个 adapter 的 seam”；术语指向 `codebase-design`，未安装时只给一句白话说明，不重新定义。同时新增 `tests/spec-design/run.sh`（TC-1、TC-8 至 TC-12 的检查），在任何 skill 文件存在前运行，6 项全部失败，符合预期。
 
 ## 6. Validation Evidence (append-only)
+
+- 2026-11-03 TC-10 | type: feature | method: command | command: tests/spec-design/run.sh red-flags | exit: 0 | output: "ok   red-flags", "spec-design checks: 0 failure(s)" | result: pass | note: before the file existed the same check failed with "missing .../design-red-flags.md", "does not point to codebase-design"
 
 ## 7. Change Requests (append-only)
