@@ -45,7 +45,7 @@ SKILL.md 分“扫描”和“处理”两段，输出熵源清单、每项处�
 
 - [~] p1-1 编写 SKILL.md（内联 refactor 门槛） → TC-1, TC-2, TC-3, TC-4
 - [x] p1-2 补充 `agents/openai.yaml`，更新 README → none (reason: 元数据和文档，不改变 agent 行为)
-- [ ] p1-3 用 case designer 设计 `evals/reduce-entropy/` 中 TC-1 至 TC-3 的用例，新增 `npm run eval:reduce-entropy`；**先经用户审核，再实际运行** → TC-1, TC-2, TC-3
+- [~] p1-3 用 case designer 设计 `evals/reduce-entropy/` 中 TC-1 至 TC-3 的用例，新增 `npm run eval:reduce-entropy`；**先经用户审核，再实际运行** → TC-1, TC-2, TC-3
 - [ ] p2-1 在一个真实项目上试运行一次（项目由用户之后指定） → TC-5, TC-6, TC-7
 
 ## 4. Test and Acceptance Criteria
@@ -81,6 +81,9 @@ SKILL.md 分“扫描”和“处理”两段，输出熵源清单、每项处�
 - 2026-11-03 p1-1 实现完成：`skills/engineering/reduce-entropy/SKILL.md`，用户触发（`disable-model-invocation: true`）。分扫描、逐项改动、把重复错误变成结构三段；refactor 门槛块逐字内联。参考 pstack refactoring playbook、`correct`、`no-comments`，按本仓库规则改写：不使用子 agent 和模型配置；大改动写成 Task 交回主流程；发现 bug 不修，固定现状并报告。
 - 2026-11-03 p1-1 按当前状态 [~] 提交：TC-4 已通过；TC-1 至 TC-3 依赖 p1-3 的 eval 用例，用例须先经用户审核再运行，所以 p1-1 暂不标 [x]。提交是为了在并行 worktree 中保存可审阅的成果，不表示条目完成；用例运行通过后追加证据并标 [x]。
 - 2026-11-03 p1-2 completed：`skills/engineering/reduce-entropy/agents/openai.yaml`（`allow_implicit_invocation: false`，与 code-review 一致）；README 在 User-invoked 下新增条目，并在目录结构中列出。条目映射为 none，不需要 TC 证据。`docs/ai-engineering-workflow-overview.md` 按要求未修改。
+- 2026-11-03 p1-3 started。
+- 2026-11-03 p1-3 用例设计完成：`evals/reduce-entropy/` 新增 3 个用例（`inventory-with-evidence`、`pin-before-change`、`repeated-mistake-to-check`），共用 fixture `invoice-cli`；`package.json` 新增 `eval:reduce-entropy`。eval hook 只做一次提交，历史改为 fixture 中导出的 `docs/git-log.txt` 和 `docs/review-notes.md`，理由见 case-review.md。不调用 agent 的检查已完成：fixture 检查、18 个模拟结果（3 个正确、15 个错误）全部按预期判定、泄漏检查、`promptfoo validate`。检查中发现并修正一处断言弱点（变异点从 pricing.js 移到包装层调用处）。等待用户审核，审核通过后再实际运行；未运行 `evals/run.sh`。
+- 2026-11-03 p1-3 按当前状态 [~] 提交，理由同 p1-1：TC-1 至 TC-3 要等用例审核和实际运行。
 
 ## 6. Validation Evidence (append-only)
 
