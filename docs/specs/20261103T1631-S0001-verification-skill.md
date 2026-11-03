@@ -3,11 +3,11 @@
 Spec-ID: S0001
 Task-ID: (待建)
 Change-Type: feature
-Status: draft
+Status: active
 Created Time: 2026-11-03T13:55:00+08:00
-Start Time:
+Start Time: 2026-11-03T16:31:29+08:00
 Completion Time:
-Previous Spec-ID:
+Previous Spec-ID: S0002
 Closure Reason:
 
 ## 1. Requirement Details
@@ -191,6 +191,7 @@ TC-2 至 TC-7 在试点项目上运行，试点项目由用户在 p2 开始前�
 - 2026-11-03 并行交付：本 spec 在独立 worktree 分支中激活和交付，与 S0007、S0004、S0005 并行；main 上只合入已关闭的 spec。用户同意。
 - 2026-11-03 gate A passed: requirements as discussed with the user in the planning session. Decided by: user.
 - 2026-11-03 gate B passed: user approved activating and delivering S0001 ("按照这个顺序继续推进"). Decided by: user.
+- 2026-11-03 激活。Task-ID 暂缺：Task-ID 规则在 S0009，本 spec 按现行 Spec-ID 规则执行。
 
 ## 6. Validation Evidence (append-only)
 
