@@ -131,40 +131,55 @@ spec 中引用功能的写法：`method: verify:<feature-id>/<sub-feature>`。
 ## References
 
 - `docs/research/2026-11-03-pstack.md`
-- `docs/specs/draft/S0002-immutable-spec-upgrade.md`（通过标准、结论用词、收尾检查）
+- `docs/specs/completed/20261103T1525-S0002-immutable-spec-upgrade.md`（通过标准、结论用词、收尾检查）
 - pstack `skills/create-verification-skill/`、`skills/maintain-verification-skill/`、`docs/guide/06-verify-and-ship.md`
 
 ## 3. Execution Plan
 
-- [ ] p1-1 调研 Claude Code、Codex、Cursor 项目级 skill 的发现路径，确定产物根目录（D1），把决策追加到 Execution Log
-- [ ] p1-2 编写 `references/drive-contract.md`
-- [ ] p1-3 编写 SKILL.md 的 create
-- [ ] p1-4 编写 SKILL.md 的 maintain（局部和全量）
-- [ ] p1-5 编写 `references/feature-map-example/`（含 `Source entry points`）
-- [ ] p1-6 补充 `agents/openai.yaml`，更新 README 与工作流概览
-- [ ] p2-1 试点 A：在一个 Web 或 CLI 项目上运行 create（项目待定）
-- [ ] p2-2 试点 B：在一个 Aiken 项目上运行 create，与 `aiken-debug` 对照（项目待定）
-- [ ] p2-3 局部更新试点：在试点 A 上做一次新增功能的改动，运行 `maintain --scope`
-- [ ] p2-4 全量检查试点：在试点 A 上人为制造漂移和一个产品回归，运行 `maintain`
+p1 交付 skill 文本，用静态检查（TC-1、TC-8）验收；skill 的行为由 p1-7 的 eval 用例（TC-9 至 TC-12）和 p2 的试点（TC-2 至 TC-7）验收。全部通过之前本 spec 不关闭。
+
+- [ ] p1-1 调研 Claude Code、Codex、Cursor 项目级 skill 的发现路径，确定产物根目录（D1），把决策追加到 Execution Log → TC-8
+- [ ] p1-2 编写 `references/drive-contract.md` → TC-1
+- [ ] p1-3 编写 SKILL.md 的 create → TC-1
+- [ ] p1-4 编写 SKILL.md 的 maintain（局部和全量） → TC-1
+- [ ] p1-5 编写 `references/feature-map-example/`（含 `Source entry points`） → TC-1
+- [ ] p1-6 补充 `agents/openai.yaml`，更新 README（工作流概览由用户维护，本 spec 不修改） → TC-1
+- [ ] p1-7 用 case designer 设计 `evals/verification/` 用例，先不调用 agent 验证用例本身，经用户审核后再实际运行 → TC-9, TC-10, TC-11, TC-12
+- [ ] p2-1 试点 A：在一个 Web 或 CLI 项目上运行 create（项目待定） → TC-2, TC-3, TC-4
+- [ ] p2-2 试点 B：在一个 Aiken 项目上运行 create，与 `aiken-debug` 对照（项目待定） → TC-5
+- [ ] p2-3 局部更新试点：在试点 A 上做一次新增功能的改动，运行 `maintain --scope` → TC-6
+- [ ] p2-4 全量检查试点：在试点 A 上人为制造漂移和一个产品回归，运行 `maintain` → TC-7
 
 ## 4. Test and Acceptance Criteria
 
-行为类 TC 用 S0008 的 eval 用例验证，用例放在 `evals/<skill>/`，写法为 `method: command: npm run eval:<skill>` 加用例 ID。下面写成自然语言的行为类 TC，在执行前用 case designer 转成用例，并由人审核。
+行为类 TC 用 S0008 的 eval 用例验证，用例放在 `evals/verification/`，由 `npm run eval:verification` 运行，证据行写明用例 ID。用例先经用户审核再运行。
 
-- TC-1 frontmatter 合法，`name` 与目录名一致，所有引用文件都存在。
-  method: command: 检查 frontmatter 和引用路径
-- TC-2 SKILL.md 不要求安装其他 skill；生成的产物里包含 `drive-contract.md`。
-  method: command: 检查引用；检查试点 A 的产物
+TC-2 至 TC-7 在试点项目上运行，试点项目由用户在 p2 开始前指定。下文 `<pilot-A>`、`<pilot-B>` 指试点项目根目录，`<app>` 指生成的工具名。
+
+- TC-1 skill 结构检查通过：frontmatter 合法，`name` 与目录名一致；SKILL.md 与 references 中引用的文件都存在；SKILL.md 不要求安装其他 skill；`drive-contract.md` 的结论用词恰好是 `pass`、`fail`、`inconclusive`、`unreachable`；`feature-map-example` 的每个功能文件按顺序有五个二级标题；`agents/openai.yaml` 存在；README 列出 `verification`。
+  method: command: `tests/verification/structure.sh`
+- TC-2 试点 A 的产物包含与 skill 相同的 `drive-contract.md`，并按 D1 在 agent skill 目录中有 `verify-<app>` 包装。
+  method: command: `diff skills/engineering/verification/references/drive-contract.md <pilot-A>/docs/verification/<app>/drive-contract.md`，再列出 `<pilot-A>/.claude/skills/verify-*/SKILL.md` 与 `<pilot-A>/.agents/skills/verify-*/SKILL.md`
 - TC-3 试点 A 生成的 `verify-<app>` 被完整执行一次：启动、健康检查、驱动一个功能、采集证据、清理，并确认清理后证据还在。
-  method: command: 按产物步骤执行，记录每一步的输出
+  method: command: 在 `<pilot-A>` 上按产物的 Launch、Doctor、Drive、Evidence、Cleanup 逐步执行并记录每一步的输出，最后 `ls <pilot-A>/.verify-artifacts/<run-id>/`
 - TC-4 在两个 worktree 中同时运行试点 A 的验证，互不冲突；或产物明确声明只能单实例运行。
-  method: command: 两个 worktree 同时执行 TC-3
+  method: command: 在 `<pilot-A>` 的两个 worktree 中同时执行 TC-3 的步骤，比较两次运行的端口、数据目录和证据目录
 - TC-5 试点 B 达到 TC-3 的标准，或者在 `unreachable` 中写明具体的前置条件。
-  method: command: 同 TC-3
+  method: command: 在 `<pilot-B>` 上执行 TC-3 的步骤
 - TC-6 局部更新：新功能被写进清单，受影响的功能被实际运行过，未受影响的功能没有被运行。
-  method: command: 在试点 A 上运行 `maintain --scope`，检查清单的 diff 和运行记录
+  method: command: 在 `<pilot-A>` 上运行 `maintain --scope <新增功能的 diff>`，检查 `docs/verification/` 的改动和 `.verify-artifacts/<run-id>/` 下的功能目录
 - TC-7 全量检查：人为制造的漂移被识别并修正，结论为 `changed`；人为制造的产品回归被报告，没有被改文档掩盖。
-  method: command: 在试点 A 上运行 `maintain`
+  method: command: 在 `<pilot-A>` 上制造漂移和回归后运行 `maintain`，检查输出、文档改动，并确认产品代码未改动
+- TC-8 D1 选定的布局能被 `spec-lint` 识别：只有 `.claude/skills/verify-*` 包装、只有 `.agents/skills/verify-*` 包装、两者都有，三种情况下 `--stage close` 都要求验收工具更新；只有 `docs/verification/` 主体时不要求。
+  method: command: `tests/verification/layout.sh`
+- TC-9 eval 用例 `verification.create-proves-before-handover`：在一个能运行的小 CLI 项目上 create，产物按 D1 布局写出并记录一次完整运行，证据在清理后仍在，产品代码未改。
+  method: command: `npm run eval:verification`
+- TC-10 eval 用例 `verification.create-unrunnable-stays-draft`：项目在当前环境中启动不了，create 不把没运行过的工具当作交付（要么不写，要么标为草稿），输出说明卡在哪一步，产品代码未改。
+  method: command: `npm run eval:verification`
+- TC-11 eval 用例 `verification.maintain-reports-regression`：全量 maintain 修正文档漂移并提交；产品回归只报告，不改产品代码，也不改文档去迁就它。
+  method: command: `npm run eval:verification`
+- TC-12 eval 用例 `verification.maintain-scope-only-mapped`：`maintain --scope` 把新功能写进清单并运行它，不运行、不修改未受影响的功能。
+  method: command: `npm run eval:verification`
 - 通过标准：全部 `pass`。
 
 ## 5. Execution Log (append-only)
@@ -172,6 +187,10 @@ spec 中引用功能的写法：`method: verify:<feature-id>/<sub-feature>`。
 - 2026-11-03 草稿创建。
 - 2026-11-03 草稿曾被删除，随后恢复并缩小范围：证据门槛和结论用词移到 S0002；新增三个触发时机和 `maintain --scope`。依赖 S0002。
 - 2026-11-03 草稿修订（按挑战结论）：证据行必须摘录关键输出，证据目录只作补充。
+- 2026-11-03 草稿修订（激活前）：每条 TC 写明验证方式，每个条目映射到 TC；新增 TC-8（D1 布局能被 spec-lint 识别）、TC-9 至 TC-12（eval 用例）和条目 p1-7（eval 用例设计与运行）；TC-2 改为只检查试点产物，“不要求安装其他 skill”并入 TC-1；p1-6 不再包含工作流概览。`spec-lint --stage activate` 通过，没有 manual TC。
+- 2026-11-03 并行交付：本 spec 在独立 worktree 分支中激活和交付，与 S0007、S0004、S0005 并行；main 上只合入已关闭的 spec。用户同意。
+- 2026-11-03 gate A passed: requirements as discussed with the user in the planning session. Decided by: user.
+- 2026-11-03 gate B passed: user approved activating and delivering S0001 ("按照这个顺序继续推进"). Decided by: user.
 
 ## 6. Validation Evidence (append-only)
 
