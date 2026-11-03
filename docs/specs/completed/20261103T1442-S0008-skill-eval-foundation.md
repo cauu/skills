@@ -3,12 +3,12 @@
 Spec-ID: S0008
 Task-ID: (待建)
 Change-Type: feature
-Status: active
+Status: completed
 Created Time: 2026-11-03T16:00:00+08:00
 Start Time: 2026-11-03T14:42:15+08:00
-Completion Time:
+Completion Time: 2026-11-03T15:18:23+08:00
 Previous Spec-ID:
-Closure Reason:
+Closure Reason: delivered
 
 ## 1. Requirement Details
 
@@ -146,6 +146,8 @@ provider 配置在 p1-1 中确认：
 - 2026-11-03 p1-5 completed: `evals/README.md` covers what runs, requirements, commands, exit behavior, cost, the evidence boundary, and how to add cases.
 
 - 2026-11-03 p1-4 用例审核：用户批准 `immutable-spec.no-commit-without-evidence` 及其对照测试，用例正式生效。决定人：用户。补齐了 p1-4 中“人工审核”这一步（审核晚于首次运行，原因见上文）。
+
+- 2026-11-03 用户确认关闭，结束原因 delivered。
 
 ## 6. Validation Evidence (append-only)
 
