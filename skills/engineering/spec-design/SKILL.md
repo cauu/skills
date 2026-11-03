@@ -71,6 +71,13 @@ Declare the `Change-Type` (`feature`, `optimization`, `bugfix`, or `refactor`). 
 - `command: <command or steps>`: a command or concrete steps the agent runs itself.
 - `manual (reason: <why>)`: only when the agent cannot run the check.
 
+Write the method on the line after the TC, indented, after the literal key `method:`. Tools such as `spec-lint` read only this form:
+
+```markdown
+- TC-1 <observable result>
+  method: command: <command or steps>
+```
+
 Prefer methods the agent runs. Every TC must meet the evidence gate of the change type:
 
 <!-- gate:feature -->
@@ -88,7 +95,7 @@ Prefer methods the agent runs. Every TC must meet the evidence gate of the chang
 
 When a TC must run on the real application and the project has no `verify-<app>` skill, propose creating one (`verification create`) in a decision brief. The user decides.
 
-Map every execution plan item to its TCs with `→ TC-1, TC-2`, or `→ none (reason: ...)`. When `immutable-spec` is installed, run its `scripts/spec-lint --stage activate <spec>` and fix every error. Otherwise check by hand: every TC has one method, every `manual` has a reason, every item is mapped.
+Map every execution plan item to its TCs with `→ TC-1, TC-2`, or `→ none (reason: ...)`. When `immutable-spec` is installed, run its `scripts/spec-lint --stage activate <spec>` and fix every error. Otherwise check by hand: every TC has exactly one `method:` line in the form above, every `manual` has a reason, every item is mapped.
 
 ### 8. Gate B: request activation
 

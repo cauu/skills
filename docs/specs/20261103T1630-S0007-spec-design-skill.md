@@ -84,6 +84,7 @@ pstack 有技术设计能力（`architect`、`arena`、Prototype playbook、mult
 - [~] p1-6 用 case designer 设计 `evals/spec-design/` 中 TC-2 至 TC-7 的用例，加入 `npm run eval:spec-design`，**先经用户审核，再实际运行** → TC-2, TC-3, TC-4, TC-5, TC-6, TC-7
 - [ ] p2-1 用一个真实 feature Task 试运行，走到关口 B → TC-13
 - [ ] p2-2 用一个复杂 bug 试运行简化版 → TC-14
+- [x] p1-1-fix1 SKILL.md 第 7 步写明 TC 验证方式的行格式（`method:` 键） → TC-6, TC-8
 
 ## 4. Test and Acceptance Criteria
 
@@ -134,6 +135,9 @@ pstack 有技术设计能力（`architect`、`arena`、Prototype playbook、mult
 - 2026-11-03 p1-4 completed：`immutable-spec-orca` “Draft and Activation” 第 3 步保留原句，补充“安装了 `spec-design` 时按它执行到关口 B 提请；未安装时照本步直接做”。依赖声明（requires: immutable-spec）未变，orca 不依赖 spec-design。
 - 2026-11-03 p1-5 completed：`agents/openai.yaml`（`allow_implicit_invocation: false`，与 code-review 一致）；README 在 User-invoked 下新增 spec-design 条目，目录树加入 `spec-design/`。工作流概览未改（未纳入版本控制，按任务要求不动）。
 - 2026-11-03 p1-6 用例设计完成，未运行：7 个用例（TC-2 一个、TC-3 一个、TC-4 两个、TC-5 一个、TC-6 一个、TC-7 一个），fixtures、断言与 `case-review.md` 在 `evals/spec-design/`，`package.json` 新增 `eval:spec-design`。不调用 agent 的检查已完成：6 份 fixture spec 的 `spec-lint --stage activate` 均按预期失败（都是设计中的 draft）；24 个模拟结果（7 个正确、17 个错误）全部判定正确；泄漏检查 36 个词，任务和 fixture 中只在 plan-needs-methods 已写好的方案里出现模板标题，该用例的断言不检查这些标题。p1-6 保持 [~]：等用户审核用例后再运行，TC-2 至 TC-7 尚无证据。本次提交只保存用例源码供审核，不表示条目完成。
+- 2026-11-03 p1-6 用例审核：用户批准 spec-design 的全部用例、case-review 中列出的判断和三个默认设置；接受用例源码在进行中状态下提交。决定人：用户。
+- 2026-11-03 第一次全量运行被用量上限打断：5 个通过，plan-needs-methods 和 bug-draft 两个报错（"You've hit your 5-hour limit"），属于基础设施问题，不是 skill 失败，结果作废。上限重置后整套重跑：6 个通过，`spec-design.gate-b-plan` 失败，只有 activationLintPasses 为 false。单独重跑该用例并查看工作区：agent 给每条 TC 都写了可运行的命令，条目也都映射了 TC，但写成了 `- command: ...`，没有用 `method: command: ...` 行，spec-lint 报 "TC-1 has no method" 至 TC-4。判断为 skill 的问题：第 7 步只列了三种方式，没写出 spec 中的行格式。按追加条目 p1-1-fix1 修复，用例不改。
+- 2026-11-03 p1-1-fix1 completed：第 7 步加入 TC 行格式示例（TC 下一行缩进写 `method: <方式>`），并说明 spec-lint 等工具只读这种写法；未安装 immutable-spec 时的人工检查改为“每条 TC 恰有一行 `method:`”。门槛块未动，一致性检查 ok。修复后单独重跑 gate-b-plan 通过（第 1 轮修复）。
 
 ## 6. Validation Evidence (append-only)
 
@@ -143,5 +147,8 @@ pstack 有技术设计能力（`architect`、`arena`、Prototype playbook、mult
 - 2026-11-03 TC-8 | type: feature | method: command | command: tests/spec-design/run.sh gates && scripts/check-skill-consistency.py && tests/consistency/run.sh | exit: 0 | output: "ok   gates"; "ok: 4 gates in immutable-spec, 8 skills checked"; "consistency mutations: 0 failure(s)" | result: pass | note: extra mutation on a copy (feature gate in spec-design changed) made check-skill-consistency.py exit 1 with "gate 'feature' differs from immutable-spec", so the real copy is covered
 - 2026-11-03 TC-9 | type: feature | method: command | command: tests/spec-design/run.sh orca && scripts/check-skill-consistency.py | exit: 0 | output: "ok   orca"; "ok: 4 gates in immutable-spec, 8 skills checked"; tests/consistency/run.sh also "consistency mutations: 0 failure(s)" | result: pass | note: before the edit the orca check failed with "step 3 does not point to spec-design"
 - 2026-11-03 TC-12 | type: feature | method: command | command: tests/spec-design/run.sh install | exit: 0 | output: "ok   install", "spec-design checks: 0 failure(s)" | result: pass | note: checks display_name, allow_implicit_invocation: false, README user-invoked entry and tree line
+- 2026-11-03 TC-6 | type: feature | method: command | command: npm run eval:spec-design | exit: 100 (this case failed) | output: spec-design.gate-b-plan fail; {"activationLintPasses":false,...all others true}; spec-lint on the agent's draft: "TC-1 has no method" through TC-4; the agent wrote "- command: `node bin/notes.js export ...`" | result: fail | note: suite run cauu-skill-eval.TWpMoY and single rerun cauu-skill-eval.fvqIFP, before p1-1-fix1
+- 2026-11-03 TC-6 | type: feature | method: command | command: evals/run.sh spec-design --filter-pattern "activation is requested" | exit: 0 | output: spec-design.gate-b-plan pass, "All assertions passed"; spec-lint --stage activate on the agent's draft: ok; "I've finished S0003 up to gate B. It's still `Status: draft` and nothing is committed. I haven't logged gate B or activated the spec, because only your reply can do that." | result: pass | note: after p1-1-fix1 (cauu-skill-eval.4TcJmu)
+- 2026-11-03 TC-8 | type: feature | method: command | command: tests/spec-design/run.sh gates && scripts/check-skill-consistency.py && tests/consistency/run.sh | exit: 0 | output: "ok   gates"; "ok: 4 gates in immutable-spec, 8 skills checked"; "consistency mutations: 0 failure(s)" | result: pass | note: after p1-1-fix1; gate blocks untouched
 
 ## 7. Change Requests (append-only)
