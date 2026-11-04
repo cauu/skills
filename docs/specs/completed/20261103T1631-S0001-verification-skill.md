@@ -3,12 +3,12 @@
 Spec-ID: S0001
 Task-ID: (待建)
 Change-Type: feature
-Status: active
+Status: completed
 Created Time: 2026-11-03T13:55:00+08:00
 Start Time: 2026-11-03T16:31:29+08:00
-Completion Time:
+Completion Time: 2026-11-04T10:36:25+08:00
 Previous Spec-ID: S0002
-Closure Reason:
+Closure Reason: delivered
 
 ## 1. Requirement Details
 
@@ -259,6 +259,9 @@ TC-2 至 TC-7 在试点项目上运行，试点项目由用户在 p2 开始前�
 - 2026-11-03 p1-4-fix2 completed（来自试点 A 的 TC-6 失败：`cbor.rs` 同时是 `cbor` 和 `tx-offline` 的源码入口，局部更新只驱动了 `cbor`，`tx-offline` 既没运行也没提到，新入口并入已有功能也没说明理由）：SKILL.md 的 maintain --scope 改为：源码入口列出改动路径的功能都算受影响，不论列的是哪个符号，只能在报告中点名并给出理由才可排除；新入口只有在是到达已有行为的另一种方式（如同一命令的 flag 或别名）时才并入已有功能，否则单建功能文件，报告写明选择和理由；报告逐项列出受影响功能与匹配路径、被排除功能与理由、新入口的去向。eval 用例 `maintain-scope-only-mapped` 扩展：fixture 中 `list.md` 也列出 `src/commands/index.js`，新增检查 sharedPathFeatureHandled，记录在 case-review.md 的 Changed after approval；22 个模拟全部判对。
 - 2026-11-03 第四次整套运行（cauu-skill-eval.FeVJUn，基于 p1-3-fix2、p1-4-fix2 后的 skill）4 个用例全部通过，exit 0。p1-3-fix2 的行为可见：create 的 agent 在沙箱中写不了 `.claude/skills/`，报告 "one step is left ... Claude Code can't find the tool until you create it"，并给出 `mkdir -p .claude/skills/verify-notes && cat > .claude/skills/verify-notes/SKILL.md <<'EOF'` 的完整命令。
 
+- 2026-11-04 日期更正：上面 p1-3-fix2、p1-4-fix2 和“第四次整套运行”三条日志，以及 Validation Evidence 中最后 6 条证据（两条 TC-1、TC-9 至 TC-12，运行 cauu-skill-eval.FeVJUn），实际写于 2026-11-04，误记为 2026-11-03（追加脚本写死了日期）。原行不改，以此为准。
+- 2026-11-04 用户确认结束（“修完了就别跑试点了”），结束原因 delivered；未完成的试点见 Change Requests。
+
 ## 6. Validation Evidence (append-only)
 
 - 2026-11-03 TC-8 | type: feature | method: command | command: tests/verification/layout.sh | exit: 0 | output: "ok claude-wrapper-only: update required (exit 1)", "ok agents-wrapper-only: update required (exit 1)", "ok both-wrappers: update required (exit 1)", "ok body-without-wrapper: ok (exit 0)", "verification layout: 0 failure(s)" | result: pass | note: runs the real spec-lint --stage close against temporary repos laid out per D1
@@ -285,3 +288,4 @@ TC-2 至 TC-7 在试点项目上运行，试点项目由用户在 p2 开始前�
 - 2026-11-03 TC-12 | type: feature | method: command | command: npm run eval:verification | exit: 0 | output: verification.maintain-scope-only-mapped pass; checks {newFeatureMapped, newFeatureIndexed, newFeatureDriven, sharedPathFeatureHandled, unaffectedNotDriven, unaffectedNotEdited, productUnchanged, oneCommit} all true; "src/commands/index.js: list.md names this file, so list counts as affected"; "[search] got its own feature file ... filtering notes by a query is new behavior, not another way to reach list"; "Last full run: is unchanged, since this was a scoped pass" | result: pass | note: suite run cauu-skill-eval.FeVJUn, extended case
 
 ## 7. Change Requests (append-only)
+- 2026-11-04 用户决定：修复试点 A 暴露的两个问题后不再试点（不跑试点 B，不在 utxray 上重跑 TC-2、TC-6），用户将直接在新项目中使用。TC-2、TC-5、TC-6 在真实项目上未验证；修复由 eval 用例覆盖的部分见 Validation Evidence。p2-1、p2-2、p2-3 不再执行。决定人：用户。
