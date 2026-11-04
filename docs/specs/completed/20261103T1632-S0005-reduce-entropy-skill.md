@@ -3,12 +3,12 @@
 Spec-ID: S0005
 Task-ID: (待建)
 Change-Type: feature
-Status: active
+Status: completed
 Created Time: 2026-11-03T13:55:00+08:00
 Start Time: 2026-11-03T16:32:00+08:00
-Completion Time:
+Completion Time: 2026-11-04T08:52:06+08:00
 Previous Spec-ID: S0002
-Closure Reason:
+Closure Reason: delivered
 
 ## 1. Requirement Details
 
@@ -113,6 +113,8 @@ SKILL.md 分“扫描”和“处理”两段，输出熵源清单、每项处�
 - 2026-11-04 p1-3-fix1 started：按 immutable-spec "Bug Fixes Before Spec Closure" 追加计划条目 p1-3-fix1 和 TC-8（第 4 节只追加新条目，不改动原有内容）。fixture `invoice-cli-misleading-sha` 复制自 `invoice-cli`，只改了导出历史：新增只改 README 的提交 c9d81f0；PR #12 列出 e41c0d2 和 c9d81f0；PR #14 的评论写"came in with c9d81f0"。不调用 agent 的检查：fixture 检查（c9d81f0 只改 README.md、不含 toISOString；e41c0d2 带入错误写法；`npm test` 退出 0），7 个模拟结果（2 个正确、5 个错误）全部按预期判定，泄漏检查无命中，`promptfoo validate` 通过。
 - 2026-11-04 新用例单独运行（`--filter-pattern "reviewer blamed"`）：通过，46 秒，约 0.23 USD。随后全量运行一次：4 个用例全部通过，退出码 0，4 分 48 秒，约 1.18 USD（0.23 + 0.45 + 0.27 + 0.23）。没有失败，skill、用例和断言都未修改。
 - 2026-11-04 p1-3-fix1 completed：新用例、fixture、断言与 case-review.md；TC-8 有通过证据，TC-1 至 TC-3、TC-8 的最新证据来自同一次全量运行。
+
+- 2026-11-04 用户确认关闭（“同意”），结束原因 delivered。bubble-hub 的两个试点分支 pilot/reduce-entropy、pilot/reduce-entropy-2 留给用户决定是否并入 dev。
 
 ## 6. Validation Evidence (append-only)
 
