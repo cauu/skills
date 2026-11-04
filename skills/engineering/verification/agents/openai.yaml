@@ -1,0 +1,6 @@
+interface:
+  display_name: "Verification Tool"
+  short_description: "Generate and maintain a project-local tool that drives the real app with evidence"
+  default_prompt: "Use $verification create to generate this project's verify tool, or $verification maintain to keep it current."
+policy:
+  allow_implicit_invocation: false

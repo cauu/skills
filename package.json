@@ -12,7 +12,8 @@
     "eval:code-review": "evals/run.sh code-review",
     "eval:spec-design": "evals/run.sh spec-design",
     "eval:bug-fix": "evals/run.sh bug-fix",
-    "eval:reduce-entropy": "evals/run.sh reduce-entropy"
+    "eval:reduce-entropy": "evals/run.sh reduce-entropy",
+    "eval:verification": "evals/run.sh verification"
   },
   "devDependencies": {
     "promptfoo": "0.122.0"
