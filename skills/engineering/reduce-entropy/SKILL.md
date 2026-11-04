@@ -31,11 +31,13 @@ Output:
 
 `Action` is delete, collapse, or encode at level N (section 3), or leave with a reason. `Size` is small or large.
 
+Verify every citation before it goes in the table: run `git show <sha>` for each commit and open each `file:line`, and confirm it shows what the entry claims. A commit from the same feature or PR is not enough. Correct a citation that does not match, or drop it.
+
 If the user asked only for the scan, stop here.
 
 ## 2. Change, one entry at a time
 
-**Small** means a few files in one module, no interface used outside the repository, and a diff one reviewer checks in minutes. Everything else is **large**: do not change code for it. Write it up as a Task (a draft spec where the project uses immutable-spec) with the entry, the target shape, and the pin plan, and hand it back to the user's normal delivery flow.
+**Small** means a few files in one module, no interface used outside the repository, and a diff one reviewer checks in minutes. Everything else is **large**: do not change code for it. Write each large entry as a Task file the user can file: a draft spec under `docs/specs/draft/` where the project uses immutable-spec, otherwise `docs/tasks/<slug>.md`. It holds the entry with its evidence, the target shape, and the pin plan. Commit it on the branch and list its path in the report. The run is not finished while a large entry has no Task file.
 
 Every change meets the refactor evidence gate (same text as `immutable-spec`):
 
@@ -64,13 +66,13 @@ For each mistake class, use the highest level that works:
 4. **Test** of the behavior.
 5. **Docs or agent rules**, only for judgment calls. Nothing fails when they are skipped.
 
-Wire the check into a command the project already runs (test, lint, or CI). Prove it on a real past mistake: replay one recorded occurrence against the current code and show the check fails with its message; show it passes without the replay. Record both commands and outputs. Do not add a check that cannot catch a real past mistake.
+Wire the check into a command the project already runs (test, lint, or CI). Prove it on a real past mistake: replay one recorded occurrence against the current code and show the check fails with its message; show it passes without the replay. In the report, record verbatim how you replayed it (the exact edit or `git show <sha>:<file>` you restored), each command you ran, and the output lines that show the failure and the pass. A result without its command is not proof. Do not add a check that cannot catch a real past mistake.
 
 ## Report
 
-- The inventory table.
+- The inventory table, citations verified.
 - Per change: the pin, its result before and after, the reader-load delta, kept or reverted, and the commit.
-- Per mistake class: its occurrences, the level chosen, why a higher level did not work, and the replay proof.
-- Bugs found and left alone, Tasks written for large entries, and entries left with reasons.
+- Per mistake class: its occurrences, the level chosen, why a higher level did not work, and the replay commands with their output.
+- Bugs found and left alone, the Task file path for each large entry, and entries left with reasons.
 
 Small changes go to review as they are, on the branch. The user merges.

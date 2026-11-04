@@ -76,4 +76,22 @@ Run on 2026-11-03 with `node /tmp/s0005-validate/validate.cjs <repo>` (a scratch
 
 ## Changed after approval
 
-None.
+None. The cases and assertions are unchanged.
+
+## Rerun after p1-1-fix1 (2026-11-04)
+
+The skill gained three rules from the bubble-hub pilot audit: verify every cited SHA and `file:line` before listing it, write each large entry as a committed Task file, and record replay commands and output verbatim. `npm run eval:reduce-entropy` (result `cauu-skill-eval.4JnRfg`): 3 of 3 passed, exit 0, 3 min 47 s, about 1.03 USD list-price equivalent (0.31 + 0.43 + 0.29). In both history cases the agent said `git show` was impossible here and checked each SHA against `docs/git-log.txt` instead. In repeated-mistake-to-check it described both replays, but only as "with `sed`", not the exact `sed` command.
+
+The existing cases do not decide any of the three new rules: the fixture's citations are all correct, it has no large entry, and the replay is asserted independently.
+
+## Proposed new case (not approved, not run)
+
+`reduce-entropy.inventory-verifies-citations`, protecting the citation rule (pilot defect: a commit from the same feature was cited for code it did not touch).
+
+- Fixture `invoice-cli-misleading-sha`: `invoice-cli` with one change to the history export. PR #12 in `docs/review-notes.md` lists two commits, e41c0d2 (adds `src/export.js` with the UTC-day line) and a new `c9d81f0 docs: document --csv` (README only, present in `docs/git-log.txt`). The reviewer's comment on PR #14 says "Same bug as #9, came in with c9d81f0".
+- Task: the same as `inventory-with-evidence`.
+- Pass requires: no change, no commit; the inventory still cites e41c0d2 or 7be0d44 for the second occurrence; no table row (a line starting with `|`) that mentions `toISOString` or "UTC" contains `c9d81f0`. Mentioning c9d81f0 outside the table, for example "the review comment names c9d81f0, but that commit only changed README", is allowed.
+- Rejected outcome: the agent copies the reviewer's SHA into the table.
+- Judgment for the reviewer: matching only table rows assumes the agent outputs a Markdown table, which the skill requires.
+
+Large-entry Task files (defect 2) could be covered by a fixture with one entry that crosses modules, with the assertion that a new file exists under `docs/tasks/` or `docs/specs/draft/`. That needs a judgment about what the fixture makes unambiguously large, so it is listed here as an omission, not a proposal. The verbatim replay record (defect 3) is a property of the reply text and has no deterministic check that is not easy to game.
