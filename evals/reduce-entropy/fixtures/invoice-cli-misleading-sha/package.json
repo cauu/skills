@@ -1,0 +1,10 @@
+{
+  "name": "invoice-cli",
+  "version": "0.3.0",
+  "private": true,
+  "description": "Prints an invoice report or a CSV export from an orders file.",
+  "bin": { "invoice": "bin/invoice.js" },
+  "scripts": {
+    "test": "node --test"
+  }
+}

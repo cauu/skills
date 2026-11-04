@@ -84,7 +84,15 @@ The skill gained three rules from the bubble-hub pilot audit: verify every cited
 
 The existing cases do not decide any of the three new rules: the fixture's citations are all correct, it has no large entry, and the replay is asserted independently.
 
-## Proposed new case (not approved, not run)
+## Added for p1-3-fix1 (approved by the user on 2026-11-04)
+
+`reduce-entropy.inventory-verifies-citations`, approved as proposed below on 2026-11-04 ("ok 可以"), including the judgment that only inventory table rows are checked. Implemented as fixture `invoice-cli-misleading-sha` (`invoice-cli` plus the trap commit and the misleading review note) and `assert/inventory-verifies-citations.cjs`, which also requires at least one table row to mention the mistake. Known risk of that judgment: a table row that names c9d81f0 only to reject it (for example a "wrong citation" row) fails the case.
+
+Dry run without an agent (`node /tmp/s0005-validate/validate-citations.cjs <repo>`): the fixture's c9d81f0 diff touches only `README.md` and contains no `toISOString`; e41c0d2 adds the UTC-day line; `npm test` exits 0. Seven simulated outcomes were all judged as intended: two correct (real SHAs in the table with c9d81f0 only in prose; fixing commits only) and five wrong (c9d81f0 instead of e41c0d2; c9d81f0 next to e41c0d2; mistake missing from the table; a file written; a commit made). Leak check: no check name appears in the fixture or the skill, and the task is identical to `inventory-with-evidence`.
+
+Real runs on 2026-11-04: the new case alone (`--filter-pattern "reviewer blamed"`, `cauu-skill-eval.GWhe0F`) passed in 46 s. Then the full suite (`cauu-skill-eval.6kN644`) passed 4 of 4, exit 0, in 4 min 48 s, about 1.18 USD list-price equivalent. In both runs the agent named c9d81f0 only in prose, said it changed only the README, and cited e41c0d2 in the table.
+
+### As proposed
 
 `reduce-entropy.inventory-verifies-citations`, protecting the citation rule (pilot defect: a commit from the same feature was cited for code it did not touch).
 

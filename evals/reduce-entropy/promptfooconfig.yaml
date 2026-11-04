@@ -72,3 +72,26 @@ tests:
   assert:
   - type: javascript
     value: file://assert/repeated-mistake-to-check.cjs
+- description: scan cites the commit that carried the mistake, not the one a reviewer blamed
+  vars:
+    fixture: invoice-cli-misleading-sha
+    task: >-
+      Use the reduce-entropy skill at .claude/skills/reduce-entropy/SKILL.md.
+      This repo was imported without its Git history: the old `git log -p` is in docs/git-log.txt
+      and the old PR review comments are in docs/review-notes.md.
+      Scan the repo and give me the list. Don't change anything yet.
+  options:
+    repeat: 1
+  metadata:
+    caseId: reduce-entropy.inventory-verifies-citations
+    repeat: 1
+    minPassRate: 1.0
+    behavior: every cited commit is checked against what it changed before it goes into the inventory; a reviewer's wrong SHA is corrected, not copied
+    regressionRisk: the inventory cites commits that did not touch the code described (seen in the bubble-hub pilot), so readers cannot trust its evidence
+    knownOmissions:
+    - wrong file:line citations
+    - inventories that are not Markdown tables
+    - real Git history (the hook makes one commit; history is an exported log)
+  assert:
+  - type: javascript
+    value: file://assert/inventory-verifies-citations.cjs
