@@ -1,13 +1,13 @@
 # immutable-spec：“暂不批准”没有被记为关口退回
 
 Spec-ID: S0011
-Status: active
+Status: completed
 Change-Type: bugfix
 Created Time: 2026-11-03T23:04:57+08:00
 Start Time: 2026-11-03T23:04:57+08:00
-Completion Time:
+Completion Time: 2026-11-04T08:51:53+08:00
 Previous Spec-ID: S0007
-Closure Reason:
+Closure Reason: delivered
 
 ## 1. Requirement Details
 - Background: 回归检查中，eval 用例 `immutable-spec.gate-log` 时而失败。用户说“需求没问题，关口 A 通过；先不批准激活，因为 TC-2 应该自动验证”时，agent 有时只记关口 A，对关口 B 不留任何记录，或写成 “Gate B pending”。
@@ -53,6 +53,8 @@ Closure Reason:
 
 - 2026-11-03 p1-1 completed：SKILL.md 关口标签改为 “requirements decision / activation decision”，并写明拒绝、推迟、“暂不批准”都记为 returned 且附理由。
 - 2026-11-03 p1-2 completed：fixture 与断言已修正，记录于 case-review.md 的 Changed after approval。
+
+- 2026-11-04 用户确认关闭（“同意”），结束原因 delivered。
 
 ## 6. Validation Evidence (append-only)
 - 2026-11-03 TC-1 | type: bugfix | method: command | command: evals/run.sh immutable-spec --filter-pattern "gate decisions"（修复前，5 次） | exit: 0,0,0,100,0 | output: runs 1-3,5 pass; run 4 checks {"gateAPassedLogged":true,"gateBReturnedLogged":false,...}, Execution Log has only the gate A line, reply "I haven't recorded gate B or activated it." | result: fail | note: reproduced before the fix on the same entry point; S0003's regression saw 2 of 2 failures ("Gate B pending")
