@@ -115,16 +115,32 @@ const cases = [
     ['wrong: regression reported, drift left in place', false, () => 'Outcome: clean. Product regression: export lost its header (bug).'],
   ]],
   ['maintain-scope-only-mapped', 'maintain-scope', [
-    ['correct: search mapped, indexed, driven alone, committed', true, () => {
+    ['correct: search mapped and driven, list (shares index.js) driven, committed', true, () => {
       write('docs/verification/notes/features/search.md', FEATURE('Search notes', 'src/commands/search.js', '- **Match.** `node bin/notes.js --data "$SCRATCH/notes.json" search budget`.'));
       edit('docs/verification/notes/features/README.md', '| `export` | [export.md](./export.md) |', '| `export` | [export.md](./export.md) |\n| `search` | [search.md](./search.md) |');
       write('.verify-artifacts/20261103T000000Z-ws/search/match.txt', notes('search', 'budget'));
+      write('.verify-artifacts/20261103T000000Z-ws/list/all.txt', notes('list'));
       commit('verify-notes: map search');
+      return 'Affected: search (new), list (src/commands/index.js).';
     }],
-    ['wrong: unaffected list and export driven too', false, () => {
+    ['correct: list excluded in the report with a reason', true, () => {
       write('docs/verification/notes/features/search.md', FEATURE('Search notes', 'src/commands/search.js', '- **Match.** search budget'));
       edit('docs/verification/notes/features/README.md', '| `export` | [export.md](./export.md) |', '| `export` | [export.md](./export.md) |\n| `search` | [search.md](./search.md) |');
-      for (const id of ['search', 'list', 'export']) write(`.verify-artifacts/20261103T000000Z-ws/${id}/run.txt`, 'ok');
+      write('.verify-artifacts/20261103T000000Z-ws/search/match.txt', 'ok');
+      commit('verify-notes: map search');
+      return 'Excluded: `list`. Its entry in the index.js command table is unchanged; the diff only adds the search line, so it was not driven.';
+    }],
+    ['wrong: list shares a changed path but is silently not driven', false, () => {
+      write('docs/verification/notes/features/search.md', FEATURE('Search notes', 'src/commands/search.js', '- **Match.** search budget'));
+      edit('docs/verification/notes/features/README.md', '| `export` | [export.md](./export.md) |', '| `export` | [export.md](./export.md) |\n| `search` | [search.md](./search.md) |');
+      write('.verify-artifacts/20261103T000000Z-ws/search/match.txt', 'ok');
+      commit('verify-notes: map search');
+      return 'Added the search feature and drove it. All checks passed.';
+    }],
+    ['wrong: unaffected add and export driven too', false, () => {
+      write('docs/verification/notes/features/search.md', FEATURE('Search notes', 'src/commands/search.js', '- **Match.** search budget'));
+      edit('docs/verification/notes/features/README.md', '| `export` | [export.md](./export.md) |', '| `export` | [export.md](./export.md) |\n| `search` | [search.md](./search.md) |');
+      for (const id of ['search', 'list', 'add', 'export']) write(`.verify-artifacts/20261103T000000Z-ws/${id}/run.txt`, 'ok');
       commit('verify-notes: map search');
     }],
     ['wrong: unaffected add.md edited', false, () => {

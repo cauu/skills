@@ -25,4 +25,5 @@ Preconditions:
 ## Source entry points
 
 - `src/commands/list.js`
+- `src/commands/index.js`: the `list` entry in the command table
 - `src/store.js`: `load`

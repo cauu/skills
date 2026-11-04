@@ -88,10 +88,12 @@ Both forms share these rules:
 ### maintain --scope <diff>
 
 1. List the changed paths (`git diff --name-only <range>`, or the paths given).
-2. A feature is affected when a changed path appears in its `Source entry points`. A user-facing entry point added by the diff (route, command, flag, menu item, screen) that no feature covers is a new feature. A changed path that matches nothing and adds no entry point affects nothing; say so.
-3. Update the affected features' recipes and `Source entry points`. Add a file and an index entry for each new feature.
-4. Drive every affected and new feature once. Do not drive or edit any other feature; an unmapped dependency missed here is caught by the full pass.
-5. When the run belongs to a spec, append one evidence line per driven feature to that spec's validation evidence, in the spec's format.
+2. Every feature whose `Source entry points` lists a changed path is affected, whichever symbol the line names. Exclude one only by naming it in the report with the reason, for example that the diff touches none of the symbols it lists. A changed path that matches nothing and adds no entry point affects nothing; say so.
+3. A user-facing entry point added by the diff (route, command, subcommand, flag, menu item, screen) extends an existing feature only when it is another way to reach behavior that feature already covers, such as a flag or alias of the same command. Otherwise it gets its own feature file, even when it shares a source file or command group with an existing feature. The report says which, and why.
+4. Update the affected features' recipes and `Source entry points`. Add a file and an index entry for each new feature.
+5. Drive every affected and new feature once. Do not drive or edit any other feature; an unmapped dependency missed here is caught by the full pass.
+6. Report each affected feature with the changed path that matched, each excluded feature with its reason, and each new entry point with where it went.
+7. When the run belongs to a spec, append one evidence line per driven feature to that spec's validation evidence, in the spec's format.
 
 ### maintain (full)
 

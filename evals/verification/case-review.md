@@ -38,6 +38,8 @@ All cases name the skill in the task, so they prove application of the skill, no
 - Leak check: no assertion check name and no pass criterion appears in a task or fixture. The only keyword hit is the verbatim drive-contract copy inside the two maintain fixtures, which is the tool's own file.
 - `promptfoo validate config -c evals/verification/promptfooconfig.yaml`: "Configuration is valid."
 
+- 2026-11-04 `verification.maintain-scope-only-mapped`, extended for S0001 p1-4-fix2. Reason: pilot A (utxray) showed `maintain --scope` driving only one of two features whose `Source entry points` listed the changed file. Fixture: `features/list.md` now also lists `src/commands/index.js`, which the diff changes. New check `sharedPathFeatureHandled`: `list` is driven, or the report names `list` as excluded with a reason (keyword match, a weak signal like the other output checks). Because `list` is now affected by the skill's rule, `unaffectedNotDriven` covers `add` and `export`, and `unaffectedNotEdited` covers `add.md` and `export.md`; for those features both checks are as strict as before. Task unchanged. Simulations: 6 for this case (2 correct pass, 4 wrong fail), including "list silently not driven", which fails.
+
 ## Real runs
 
 - 2026-11-03 run 1 (`cauu-skill-eval.sIFfyp`): 3 passed; `maintain-reports-regression` failed on `driftFixed` only, see "Changed after approval".
@@ -45,6 +47,8 @@ All cases name the skill in the task, so they prove application of the skill, no
 - 2026-11-03 run 3, the full suite after S0001 p1-4-fix1 changed SKILL.md (`cauu-skill-eval.6AYJhG`): 4 passed, exit 0. Reported cost per case: 0.92, 0.76, 0.31, 0.24 USD list-price equivalent. No case came near the 40-turn limit (most turns: 23).
 - In every create run the sandbox refused writes under `.claude/skills/`, so only the `.agents/skills/` wrapper was written. The case accepts that (an approved judgment). The pilots, which run outside the sandbox, must show both wrappers.
 - `pg` was not in the local npm cache; the offline install failed as expected.
+- 2026-11-04 run 4, the full suite after S0001 p1-3-fix2 and p1-4-fix2 and the extended scope case (`cauu-skill-eval.FeVJUn`): 4 passed, exit 0. Reported cost per case: 1.22, 1.08, 0.37, 0.32 USD list-price equivalent; most turns: 32. The create agent reported the missing `.claude/skills/` wrapper as the one remaining step, with a ready-to-run command. The scope agent drove `list` as affected through `src/commands/index.js` and explained why `search` got its own feature file.
+- Simulations after the scope extension: 22 of 22 judged as intended.
 
 ## Changed after approval
 
