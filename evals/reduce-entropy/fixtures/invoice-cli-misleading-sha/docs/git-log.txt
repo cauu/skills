@@ -1,0 +1,124 @@
+commit 7be0d44c18e2a9f0b3d65e71c4a0f8d2b96e3a15
+Author: Lin Wei <lin@example.com>
+Date:   Tue Oct 21 18:02:11 2026 +0800
+
+    fix(export): CSV stamp showed tomorrow's date in the evening
+
+    toISOString() is UTC. After 16:00 in Shanghai it is already the next day.
+
+diff --git a/src/export.js b/src/export.js
+--- a/src/export.js
++++ b/src/export.js
+@@ -1,8 +1,9 @@
++const { formatLocalDate } = require('./dates');
+ const { lineTotal } = require('./pricing');
+
+ function renderCsv(orders) {
+-  const stamp = new Date().toISOString().slice(0, 10);
++  const stamp = formatLocalDate(new Date());
+   const rows = [`# exported ${stamp}`, 'order,date,qty,unit_cents,line_cents'];
+   for (const order of orders) {
+     for (const line of order.lines) {
+-      rows.push([order.id, new Date(order.date).toISOString().slice(0, 10), line.qty, line.unitCents, lineTotal(line)].join(','));
++      rows.push([order.id, formatLocalDate(order.date), line.qty, line.unitCents, lineTotal(line)].join(','));
+     }
+   }
+
+commit 5d18b7e2f40c9a1d6e83b27f15c0a94d3e7b6c28
+Author: Sam Ortiz <sam@example.com>
+Date:   Mon Oct 20 10:44:37 2026 +0800
+
+    fix(report): typo in TOTAL label
+
+diff --git a/src/report.js b/src/report.js
+--- a/src/report.js
++++ b/src/report.js
+@@ -38,5 +38,5 @@ function renderReport(orders) {
+-  rows.push(`TOTLA  ${formatCents(grand)}`);
++  rows.push(`TOTAL  ${formatCents(grand)}`);
+
+commit c9d81f07e3a2b56d4c19f80e7a3b2d5c6e14f9a0
+Author: agent <agent@example.com>
+Date:   Fri Oct 17 15:41:52 2026 +0800
+
+    docs: document --csv
+
+diff --git a/README.md b/README.md
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,6 @@
+ # invoice-cli
+
+ ```sh
+ node bin/invoice.js data/orders.json          # report
++node bin/invoice.js data/orders.json --csv    # CSV export
+ ```
+
+commit e41c0d2b7a95f3c8e016d4b92a7f5e3c18d0b6a4
+Author: agent <agent@example.com>
+Date:   Fri Oct 17 15:20:09 2026 +0800
+
+    feat(export): CSV export behind --csv
+
+diff --git a/src/export.js b/src/export.js
+new file mode 100644
+--- /dev/null
++++ b/src/export.js
+@@ -0,0 +1,14 @@
++const { lineTotal } = require('./pricing');
++
++function renderCsv(orders) {
++  const stamp = new Date().toISOString().slice(0, 10);
++  const rows = [`# exported ${stamp}`, 'order,date,qty,unit_cents,line_cents'];
++  for (const order of orders) {
++    for (const line of order.lines) {
++      rows.push([order.id, new Date(order.date).toISOString().slice(0, 10), line.qty, line.unitCents, lineTotal(line)].join(','));
++    }
++  }
++  return rows.join('\n');
++}
++
++module.exports = { renderCsv };
+
+commit a3f9c21d5e7b80c4f2a69d13e5b7c0f8a4d2e691
+Author: Lin Wei <lin@example.com>
+Date:   Wed Oct 08 09:12:54 2026 +0800
+
+    fix(report): order dates showed the UTC day
+
+    Orders placed after 16:00 in Shanghai were listed under the next day.
+    Add formatLocalDate and use it in the report.
+
+diff --git a/src/dates.js b/src/dates.js
+new file mode 100644
+--- /dev/null
++++ b/src/dates.js
+@@ -0,0 +1,8 @@
++// The calendar day in the process time zone, as YYYY-MM-DD.
++function formatLocalDate(input) {
++  const d = new Date(input);
++  const pad = (n) => String(n).padStart(2, '0');
++  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
++}
++
++module.exports = { formatLocalDate };
+diff --git a/src/report.js b/src/report.js
+--- a/src/report.js
++++ b/src/report.js
+@@ -1,3 +1,4 @@
++const { formatLocalDate } = require('./dates');
+ const { formatCents } = require('./money');
+ const { lineTotal } = require('./pricing');
+@@ -33,7 +34,7 @@ function renderReport(orders) {
+     totals.push(subtotal);
+-    rows.push(`${new Date(order.date).toISOString().slice(0, 10)}  #${order.id}  ${formatCents(subtotal)}`);
++    rows.push(`${formatLocalDate(order.date)}  #${order.id}  ${formatCents(subtotal)}`);
+   }
+
+commit 91b2e6a0c3d47f8e1b5a29c06d4e8f3a7b1c5d02
+Author: agent <agent@example.com>
+Date:   Thu Oct 02 14:31:20 2026 +0800
+
+    feat: invoice report
+
+    (initial import of bin/, src/orders.js, src/pricing.js, src/money.js, src/report.js)

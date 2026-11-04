@@ -1,0 +1,25 @@
+[
+  {
+    "id": "1001",
+    "date": "2026-10-01T09:15:00+08:00",
+    "lines": [
+      { "sku": "WIDGET", "qty": 3, "unitCents": 999 },
+      { "sku": "BOLT", "qty": 12, "unitCents": 25 }
+    ]
+  },
+  {
+    "id": "1002",
+    "date": "2026-10-02T23:40:00+08:00",
+    "lines": [
+      { "sku": "GADGET", "qty": 1, "unitCents": 4500 }
+    ]
+  },
+  {
+    "id": "1003",
+    "date": "2026-10-05T14:05:00+08:00",
+    "lines": [
+      { "sku": "WIDGET", "qty": 10, "unitCents": 999 },
+      { "sku": "NUT", "qty": 40, "unitCents": 10 }
+    ]
+  }
+]

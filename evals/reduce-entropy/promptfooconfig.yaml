@@ -1,0 +1,97 @@
+description: reduce-entropy behavior cases
+providers: file://../lib/claude-provider.yaml
+extensions:
+- file://../lib/hooks.cjs:extensionHook
+prompts:
+- '{{task}}'
+tests:
+- description: scan only lists entropy with evidence and changes nothing
+  vars:
+    fixture: invoice-cli
+    task: >-
+      Use the reduce-entropy skill at .claude/skills/reduce-entropy/SKILL.md.
+      This repo was imported without its Git history: the old `git log -p` is in docs/git-log.txt
+      and the old PR review comments are in docs/review-notes.md.
+      Scan the repo and give me the list. Don't change anything yet.
+  options:
+    repeat: 1
+  metadata:
+    caseId: reduce-entropy.inventory-with-evidence
+    repeat: 1
+    minPassRate: 1.0
+    behavior: the scan lists dead code, a one-caller wrapper, a redundant validator and a mistake that happened twice, each with a file location or commit evidence, and changes nothing when the user asked only for the list
+    regressionRisk: cleanup starts from guesses, entries cannot be checked, or the agent edits code the user only wanted listed
+    knownOmissions:
+    - comments that restate code (no stable identifier to assert on)
+    - false positives such as calling the string-dispatched renderCsv dead
+    - whether a mistake seen once (the TOTLA typo) is wrongly promoted to a class
+    - real Git history (the hook makes one commit; history is an exported log)
+  assert:
+  - type: javascript
+    value: file://assert/inventory-with-evidence.cjs
+- description: cleanup pins behavior first and keeps it unchanged
+  vars:
+    fixture: invoice-cli
+    task: Use the reduce-entropy skill at .claude/skills/reduce-entropy/SKILL.md. Clean up src/report.js.
+  options:
+    repeat: 1
+  metadata:
+    caseId: reduce-entropy.pin-before-change
+    repeat: 1
+    minPassRate: 1.0
+    behavior: before restructuring, the agent writes a behavior pin through a surviving interface that passes on the original code; after deleting the wrapper and dead code the same pin passes, the pin catches a change to the restructured path, and CLI behavior (including a known bug) is unchanged
+    regressionRisk: a cleanup silently changes behavior, "fixes" a bug inside a refactor, or is accepted on type checks and lint alone
+    knownOmissions:
+    - pins that run through a command other than npm test
+    - whether a change that does not lower reader load is reverted
+    - the order of the pin commit and the change commit
+    - large changes being handed back as a Task
+  assert:
+  - type: javascript
+    value: file://assert/pin-before-change.cjs
+- description: a mistake that happened twice becomes a check proven on the past mistake
+  vars:
+    fixture: invoice-cli
+    task: >-
+      Use the reduce-entropy skill at .claude/skills/reduce-entropy/SKILL.md.
+      This repo was imported without its Git history: the old `git log -p` is in docs/git-log.txt
+      and the old PR review comments are in docs/review-notes.md.
+      Some mistakes keep coming back here. Deal with those; leave the rest of the cleanup for another day.
+  options:
+    repeat: 1
+  metadata:
+    caseId: reduce-entropy.repeated-mistake-to-check
+    repeat: 1
+    minPassRate: 1.0
+    behavior: a mistake class with two recorded occurrences is turned into a check wired into the project's commands; the check passes on current code, fails when a past occurrence is replayed, and its failure names the function to use instead
+    regressionRisk: repeated mistakes are answered with a doc note or a check that cannot catch the real mistake, so they keep recurring
+    knownOmissions:
+    - whether the chosen level is the highest that works (only lint or test is feasible in this fixture; architecture and types are not checked)
+    - a check that only runs in CI or through a script not named test, lint or check
+    - the agent's own replay proof (the assertion replays independently)
+  assert:
+  - type: javascript
+    value: file://assert/repeated-mistake-to-check.cjs
+- description: scan cites the commit that carried the mistake, not the one a reviewer blamed
+  vars:
+    fixture: invoice-cli-misleading-sha
+    task: >-
+      Use the reduce-entropy skill at .claude/skills/reduce-entropy/SKILL.md.
+      This repo was imported without its Git history: the old `git log -p` is in docs/git-log.txt
+      and the old PR review comments are in docs/review-notes.md.
+      Scan the repo and give me the list. Don't change anything yet.
+  options:
+    repeat: 1
+  metadata:
+    caseId: reduce-entropy.inventory-verifies-citations
+    repeat: 1
+    minPassRate: 1.0
+    behavior: every cited commit is checked against what it changed before it goes into the inventory; a reviewer's wrong SHA is corrected, not copied
+    regressionRisk: the inventory cites commits that did not touch the code described (seen in the bubble-hub pilot), so readers cannot trust its evidence
+    knownOmissions:
+    - wrong file:line citations
+    - inventories that are not Markdown tables
+    - real Git history (the hook makes one commit; history is an exported log)
+  assert:
+  - type: javascript
+    value: file://assert/inventory-verifies-citations.cjs
